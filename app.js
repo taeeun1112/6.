@@ -197,6 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let mosaicAnimFrame = null;
     let frameCount      = 0;
 
+    // Shared Camera Receiver variables
+    let sharedFrameImage = null;
+    let isUsingSharedCamera = false;
+    let lastFrameReceivedTime = 0;
+    let isUsingSharedTelemetry = false;
+    let lastTelemetryReceivedTime = 0;
+
     const offCanvas = document.createElement('canvas');
     const offCtx    = offCanvas.getContext('2d');
 
@@ -352,7 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * - Background: small pure-grayscale pixels
      */
     function renderMosaicFrame() {
-        if (!cameraActive || !cameraVideo || cameraVideo.readyState < 2) {
+        if (!isUsingSharedCamera && (!cameraActive || !cameraVideo || cameraVideo.readyState < 2)) {
+            mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
+            return;
+        }
+        if (isUsingSharedCamera && !sharedFrameImage) {
             mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
             return;
         }
@@ -373,7 +384,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Grab camera frame
         offCanvas.width = W;
         offCanvas.height = H;
-        offCtx.drawImage(cameraVideo, 0, 0, W, H);
+        if (isUsingSharedCamera && sharedFrameImage) {
+            offCtx.drawImage(sharedFrameImage, 0, 0, W, H);
+        } else {
+            offCtx.drawImage(cameraVideo, 0, 0, W, H);
+        }
         let imageData;
         try {
             imageData = offCtx.getImageData(0, 0, W, H);
@@ -755,15 +770,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const dt = Math.min((timestamp - state.lastTime) / 1000, 0.1); // cap at 100ms
         state.lastTime = timestamp;
  
+        // Check telemetry timeout
+        if (isUsingSharedTelemetry && Date.now() - lastTelemetryReceivedTime > 2000) {
+            isUsingSharedTelemetry = false;
+        }
+
         // Auto-simulate active riding state: smooth speed & rotation curves
         if (state.isOperating) {
-            if (!state.simManualOverride) {
+            if (!state.simManualOverride && !isUsingSharedTelemetry) {
                 state.speed = 24.5 + Math.sin(Date.now() / 6000) * 8.5;
                 state.rotation = Math.sin(Date.now() / 3200) * 35;
             }
         } else {
-            state.speed = 0;
-            state.rotation = 0;
+            if (!isUsingSharedTelemetry) {
+                state.speed = 0;
+                state.rotation = 0;
+            }
         }
  
         // --- 1. SPEED: Accumulate ride telemetry ---
@@ -985,6 +1007,90 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         btnLikePost.classList.toggle('active');
     });
+
+    // =========================================================================
+    // SHARED CAMERA RECEIVER LOGIC
+    // =========================================================================
+    function handleSharedData(data) {
+        if (data.type === 'frame') {
+            lastFrameReceivedTime = Date.now();
+            
+            // Convert Blob to ImageBitmap
+            createImageBitmap(data.blob).then(bitmap => {
+                if (sharedFrameImage && sharedFrameImage.close) {
+                    sharedFrameImage.close();
+                }
+                sharedFrameImage = bitmap;
+                
+                if (!isUsingSharedCamera) {
+                    isUsingSharedCamera = true;
+                    // Hide permission overlay
+                    if (cameraPermOverlay) {
+                        cameraPermOverlay.style.opacity = '0';
+                        setTimeout(() => { cameraPermOverlay.style.display = 'none'; }, 400);
+                    }
+                    if (mosaicControlBadge) {
+                        mosaicControlBadge.style.opacity = '1';
+                        mosaicControlBadge.style.pointerEvents = 'auto';
+                    }
+                    if (mosaicSpeedIndicator) mosaicSpeedIndicator.classList.add('visible');
+                    const legend = document.getElementById('ishihara-legend');
+                    if (legend) legend.classList.add('visible');
+                    
+                    // Trigger mosaic frame rendering if not already running
+                    if (!mosaicAnimFrame) {
+                        renderMosaicFrame();
+                    }
+                }
+            }).catch(err => {
+                console.error("Error creating ImageBitmap:", err);
+            });
+        } else if (data.type === 'telemetry') {
+            lastTelemetryReceivedTime = Date.now();
+            isUsingSharedTelemetry = true;
+            state.speed = data.speed;
+            state.rotation = data.rotation;
+            state.isOperating = data.cameraActive || data.speed > 0;
+            updateUI();
+        }
+    }
+
+    // Register BroadcastChannel listener
+    if (typeof BroadcastChannel !== 'undefined') {
+        const cameraChannel = new BroadcastChannel('camera-shared-stream');
+        cameraChannel.onmessage = (event) => {
+            handleSharedData(event.data);
+        };
+    }
+
+    // Register postMessage listener
+    window.addEventListener('message', (event) => {
+        handleSharedData(event.data);
+    });
+
+    // Check shared stream timeout (heartbeat)
+    setInterval(() => {
+        if (isUsingSharedCamera && Date.now() - lastFrameReceivedTime > 2000) {
+            isUsingSharedCamera = false;
+            if (sharedFrameImage && sharedFrameImage.close) {
+                sharedFrameImage.close();
+            }
+            sharedFrameImage = null;
+            
+            // Restore permission overlay if local camera is off
+            if (!cameraActive && cameraPermOverlay) {
+                cameraPermOverlay.style.display = 'flex';
+                cameraPermOverlay.style.opacity = '1';
+            }
+            if (mosaicSpeedIndicator) mosaicSpeedIndicator.classList.remove('visible');
+            if (mosaicControlBadge) {
+                mosaicControlBadge.style.opacity = '0';
+                mosaicControlBadge.style.pointerEvents = 'none';
+            }
+            const legend = document.getElementById('ishihara-legend');
+            if (legend) legend.classList.remove('visible');
+        }
+    }, 1000);
 
     window.state = state;
     updateUI();
