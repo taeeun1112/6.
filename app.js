@@ -1,0 +1,991 @@
+/**
+ * Mobility SNS — Full Telemetry Integration
+ *
+ * Data → Function Mappings:
+ *  SPEED  → auto-scroll speed · mosaic pixel size · OFFLINE↔LIVE toggle
+ *  STEER  → scroll direction · Ishihara palette hue-shift
+ *  GPS    → post location tag (simulated from speed/steer integral)
+ *  DIST/AVG SPEED → auto completed-ride card on ride end
+ *  DURATION → real-time like/comment count grows with ride time
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // =========================================================================
+    // STATE
+    // =========================================================================
+    let state = {
+        speed: 0,               // km/h  (0–60)
+        rotation: 0,            // degrees (-90 to 90)
+        isOperating: true,      // engine on/off
+        currentScrollSpeed: 0,  // inertia for scroll
+        lastTime: performance.now(),
+
+        // Ride telemetry
+        rideStartTime: null,    // Date.now() when ride went LIVE
+        rideDurationSec: 0,     // seconds since LIVE started
+        totalDistanceKm: 0,     // accumulated km (speed × dt integral)
+        speedSamples: [],       // for avg speed calculation
+        wasLive: false,         // true once speed exceeded LIVE threshold
+
+        // GPS simulation (bearing integration)
+        gpsBearing: 0,          // cumulative heading (degrees)
+        gpsLat: 37.5665,        // starting lat (Seoul)
+        gpsLon: 126.9780,       // starting lon
+
+        // Reaction counters
+        baseLikes: 1203,
+        baseComments: 88,
+        baseShares: 24,
+
+        // Hue shift for Ishihara palette (degrees, 0–360)
+        paletteHueShift: 0,
+
+        // Completed card shown once per ride session
+        completedCardShown: false,
+
+        // Manual slider override flag
+        manualOverride: false,
+
+        // Simulator manual override
+        simManualOverride: false,
+
+        // Heart spawn accumulator
+        heartAccumulator: 0,
+    };
+
+    // =========================================================================
+    // DOM BINDINGS
+    // =========================================================================
+    const simIsland          = document.getElementById('sim-island');
+    const islandTrigger      = document.getElementById('island-trigger');
+    const btnIslandMinimize  = document.getElementById('btn-island-minimize');
+    const simBtnPower        = document.getElementById('sim-btn-power');
+    const simInputSpeed      = document.getElementById('sim-input-speed');
+    const simInputRotation   = document.getElementById('sim-input-rotation');
+    const simValSpeed        = document.getElementById('sim-val-speed');
+    const simValRotation     = document.getElementById('sim-val-rotation');
+    const islandStatSpeed    = document.getElementById('island-stat-speed');
+    const islandStatRot      = document.getElementById('island-stat-rot');
+    const overlaySpeed       = document.getElementById('overlay-speed');
+    const overlayRotation    = document.getElementById('overlay-rotation');
+    const overlayStatusIndicator = document.getElementById('overlay-status-indicator');
+    const simPresetCruise    = document.getElementById('sim-preset-cruise');
+    const simPresetCurve     = document.getElementById('sim-preset-curve');
+    const simPresetStop      = document.getElementById('sim-preset-stop');
+
+    // Canvas & Media
+    const particleCanvas     = document.getElementById('riding-particles-canvas');
+    const pCtx               = particleCanvas?.getContext('2d');
+    const mosaicCanvas       = document.getElementById('mosaic-canvas');
+    const mosaicCtx          = mosaicCanvas?.getContext('2d');
+    const cameraVideo        = document.getElementById('camera-video');
+    const passengerMedia     = document.getElementById('passenger-media-container');
+    const leftGlow           = document.getElementById('left-steer-glow');
+    const rightGlow          = document.getElementById('right-steer-glow');
+    const cameraPermOverlay  = document.getElementById('camera-permission-overlay');
+    const btnRequestCamera   = document.getElementById('btn-request-camera');
+    const mosaicSlider       = document.getElementById('mosaic-intensity');
+    const mosaicValDisplay   = document.getElementById('mosaic-val');
+    const mosaicControlBadge = document.getElementById('mosaic-control-badge');
+    const mosaicSpeedIndicator = document.getElementById('mosaic-speed-indicator');
+    const mosaicSpeedPx      = document.getElementById('mosaic-speed-px');
+    const feedMainLayout     = document.getElementById('fb-center-feed');
+
+    // Reaction counters
+    const likeCountNum       = document.getElementById('like-count-num');
+    const commentCountNum    = document.getElementById('comment-count-num');
+    const shareCountNum      = document.getElementById('share-count-num');
+
+    // Location & completed card
+    const postLocationTag    = document.getElementById('post-location-tag');
+    const completedCard      = document.getElementById('completed-ride-card');
+    const completedLocName   = document.getElementById('completed-location-name');
+    const completedRouteName = document.getElementById('completed-route-name');
+    const completedStats     = document.getElementById('completed-stats');
+    const completedCaption   = document.getElementById('completed-caption');
+    const completedTimestamp = document.getElementById('completed-timestamp');
+
+    // Infographic elements
+    const btnLikePost        = document.getElementById('btn-like-post');
+    const likeInfographic    = document.getElementById('like-infographic');
+    const btnInfoClose       = document.getElementById('btn-info-close');
+    const infoValSpeed       = document.getElementById('info-val-speed');
+    const infoValSteer       = document.getElementById('info-val-steer');
+    const infoValDist        = document.getElementById('info-val-dist');
+    const infoValDuration    = document.getElementById('info-val-duration');
+    const infoValLoc         = document.getElementById('info-val-loc');
+
+    // =========================================================================
+    // CLOCK
+    // =========================================================================
+    function updateClock() {
+        const el = document.getElementById('current-time');
+        if (!el) return;
+        const now = new Date();
+        let h = now.getHours();
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        el.textContent = `${h}:${m} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // =========================================================================
+    // GPS SIMULATION
+    // Integrates speed + steer to compute a synthetic position and named zone.
+    // =========================================================================
+    const LOCATION_ZONES = [
+        { name: 'Mapo River 🌉',        lat: 37.546, lon: 126.903 },
+        { name: 'Yeouido Bridge 🌙',     lat: 37.527, lon: 126.930 },
+        { name: 'Banpo Han River Park 🌿', lat: 37.512, lon: 126.997 },
+        { name: 'Olympic Park ⚡',       lat: 37.520, lon: 127.124 },
+        { name: 'Ttukseom Resort 🛶',    lat: 37.530, lon: 127.068 },
+        { name: 'Gwanghwamun Plaza 🏛',  lat: 37.576, lon: 126.977 },
+        { name: 'Dongdaemun Design 🎨',  lat: 37.566, lon: 127.009 },
+        { name: 'Hongdae Street 🎵',     lat: 37.557, lon: 126.925 },
+        { name: 'Gangnam District 🏙',   lat: 37.498, lon: 127.027 },
+        { name: 'Namsan Tower 🗼',       lat: 37.551, lon: 126.988 },
+    ];
+
+    let currentZoneIndex = 0;
+    let lastGpsUpdateTime = 0;
+
+    function updateGPS(deltaTime) {
+        if (!state.isOperating || state.speed <= 0) return;
+
+        // Advance bearing based on steer (rotation maps to heading change)
+        state.gpsBearing = (state.gpsBearing + state.rotation * 0.01 * deltaTime * 60) % 360;
+
+        // Convert speed to distance increment (km per second)
+        const distIncrement = (state.speed / 3600) * deltaTime;
+        state.totalDistanceKm += distIncrement;
+
+        // Move simulated lat/lon
+        const bearingRad = (state.gpsBearing * Math.PI) / 180;
+        state.gpsLat += Math.cos(bearingRad) * distIncrement * 0.009;
+        state.gpsLon += Math.sin(bearingRad) * distIncrement * 0.009;
+
+        // Change location zone every ~0.5 km or every 12 seconds
+        const now = Date.now();
+        if (state.totalDistanceKm > 0 &&
+            (Math.floor(state.totalDistanceKm / 0.5) > currentZoneIndex ||
+             now - lastGpsUpdateTime > 12000)) {
+            currentZoneIndex = Math.floor(state.totalDistanceKm / 0.5) % LOCATION_ZONES.length;
+            lastGpsUpdateTime = now;
+            updateLocationTag();
+        }
+    }
+
+    function updateLocationTag() {
+        const zone = LOCATION_ZONES[currentZoneIndex];
+        if (postLocationTag) {
+            postLocationTag.textContent = `📍 ${zone.name}`;
+            postLocationTag.style.display = 'inline';
+            // Flash animation
+            postLocationTag.style.opacity = '0';
+            setTimeout(() => { postLocationTag.style.opacity = '1'; }, 50);
+        }
+    }
+
+    // =========================================================================
+    // CAMERA + ISHIHARA MOSAIC
+    // =========================================================================
+    let mosaicPixelSize = 20;
+    let cameraActive    = false;
+    let mosaicAnimFrame = null;
+    let frameCount      = 0;
+
+    const offCanvas = document.createElement('canvas');
+    const offCtx    = offCanvas.getContext('2d');
+
+    function resizeCanvas() {
+        if (particleCanvas && passengerMedia) {
+            particleCanvas.width  = passengerMedia.clientWidth;
+            particleCanvas.height = passengerMedia.clientHeight;
+        }
+        if (mosaicCanvas && passengerMedia) {
+            mosaicCanvas.width  = passengerMedia.clientWidth;
+            mosaicCanvas.height = passengerMedia.clientHeight;
+        }
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    /** Speed → foreground pixel size (12–36px). Inverted: fast speed = many pixels (12px), slow = few (36px) */
+    function speedToMosaicSize(speed) {
+        const minPx = 12, maxPx = 36;
+        // Reach maximum clarity (12px) at 25 km/h instead of 60 km/h
+        // Linear transition for responsive and clear visual feedback during active riding
+        const eased = Math.min(1, speed / 25);
+        return Math.round(maxPx - eased * (maxPx - minPx));
+    }
+
+    // ---- ISHIHARA PALETTES (Thermal sorted from dark to bright) ----
+    const COLD_PALETTE = [
+        [30,  58,  138], // navy/blue (darkest)
+        [29,  78,  216], // blue
+        [59,  130, 246], // light blue
+        [16,  185, 129], // emerald green
+        [34,  197, 94 ], // vivid green
+        [132, 204, 22 ]  // lime green (brightest)
+    ];
+
+    const MID_PALETTE = [
+        [217, 119, 6  ], // dark amber (darkest)
+        [249, 115, 22 ], // orange
+        [245, 158, 11 ], // amber
+        [251, 146, 60 ], // peach orange
+        [234, 179, 8  ], // yellow
+        [250, 204, 21 ]  // light yellow (brightest)
+    ];
+
+    const HOT_PALETTE = [
+        [153, 27,  27 ], // dark red (darkest)
+        [220, 38,  38 ], // red
+        [225, 29,  72 ], // rose
+        [239, 68,  68 ], // coral red
+        [254, 226, 226], // light pink/white
+        [255, 255, 255]  // pure white (brightest)
+    ];
+
+    // Interpolates through thermal imaging gradient based on speed: Cold (Blue/Green) -> Mid (Yellow/Orange) -> Hot (Red/White)
+    function getSpeedInterpolatedPalette(speed) {
+        const palette = [];
+        if (speed <= 18) {
+            // Speed <= 18 km/h: Full cold blue/green (covers the low end of simulated riding 16 km/h)
+            return COLD_PALETTE;
+        } else if (speed <= 26) {
+            // Speed 18 to 26 km/h: Transition from COLD (blue/green) to MID (yellow/orange)
+            const t = (speed - 18) / 8;
+            for (let i = 0; i < COLD_PALETTE.length; i++) {
+                const r = Math.round(COLD_PALETTE[i][0] + t * (MID_PALETTE[i][0] - COLD_PALETTE[i][0]));
+                const g = Math.round(COLD_PALETTE[i][1] + t * (MID_PALETTE[i][1] - COLD_PALETTE[i][1]));
+                const b = Math.round(COLD_PALETTE[i][2] + t * (MID_PALETTE[i][2] - COLD_PALETTE[i][2]));
+                palette.push([r, g, b]);
+            }
+        } else if (speed <= 32) {
+            // Speed 26 to 32 km/h: Transition from MID (yellow/orange) to HOT (red/white)
+            const t = (speed - 26) / 6;
+            for (let i = 0; i < MID_PALETTE.length; i++) {
+                const r = Math.round(MID_PALETTE[i][0] + t * (HOT_PALETTE[i][0] - MID_PALETTE[i][0]));
+                const g = Math.round(MID_PALETTE[i][1] + t * (HOT_PALETTE[i][1] - MID_PALETTE[i][1]));
+                const b = Math.round(MID_PALETTE[i][2] + t * (HOT_PALETTE[i][2] - MID_PALETTE[i][2]));
+                palette.push([r, g, b]);
+            }
+        } else {
+            // Speed > 32 km/h: Full hot red/white (covers the high end of simulated riding 33 km/h)
+            return HOT_PALETTE;
+        }
+        return palette;
+    }
+
+    // Pure cold-toned blue/purple/slate BG palette
+    const BG_PALETTE = [
+        [15,  23,  42 ], // slate 900
+        [30,  41,  59 ], // slate 800
+        [29,  78,  216], // blue 700
+        [67,  56,  202], // indigo 700
+        [109, 40,  217], // purple 700
+        [71,  85,  105], // slate 600
+        [148, 163, 184], // slate 400
+    ];
+
+    /**
+     * Apply hue rotation to an RGB color (in degrees).
+     * Uses matrix rotation in RGB space (approximate but fast).
+     */
+    function rotateHue(r, g, b, angleDeg) {
+        if (angleDeg === 0) return [r, g, b];
+        const cos = Math.cos(angleDeg * Math.PI / 180);
+        const sin = Math.sin(angleDeg * Math.PI / 180);
+        const nr = Math.min(255, Math.max(0, Math.round(
+            r * (0.213 + cos * 0.787 - sin * 0.213) +
+            g * (0.715 - cos * 0.715 - sin * 0.715) +
+            b * (0.072 - cos * 0.072 + sin * 0.928)
+        )));
+        const ng = Math.min(255, Math.max(0, Math.round(
+            r * (0.213 - cos * 0.213 + sin * 0.143) +
+            g * (0.715 + cos * 0.285 + sin * 0.140) +
+            b * (0.072 - cos * 0.072 - sin * 0.283)
+        )));
+        const nb = Math.min(255, Math.max(0, Math.round(
+            r * (0.213 - cos * 0.213 - sin * 0.787) +
+            g * (0.715 - cos * 0.715 + sin * 0.715) +
+            b * (0.072 + cos * 0.928 + sin * 0.072)
+        )));
+        return [nr, ng, nb];
+    }
+
+    function buildFgPalette() {
+        const basePalette = getSpeedInterpolatedPalette(state.speed);
+        // steer -90..90 → hue shift -60..+60 degrees
+        const hue = state.paletteHueShift;
+        return basePalette.map(([r, g, b]) => rotateHue(r, g, b, hue));
+    }
+
+    /** Nearest-colour quantization. */
+    function quantize(r, g, b, palette) {
+        let bestDist = Infinity, best = palette[0];
+        for (const col of palette) {
+            const d = (r-col[0])**2 + (g-col[1])**2 + (b-col[2])**2;
+            if (d < bestDist) { bestDist = d; best = col; }
+        }
+        return best;
+    }
+
+    /**
+     * Elliptical foreground zone — centre-weighted person area.
+     * Returns 0 (background) .. 1 (fully foreground).
+     */
+    function getForegroundness(x, y, W, H) {
+        const cx = W / 2, cy = H * 0.52;
+        const dx = (x - cx) / (W * 0.50);
+        const dy = (y - cy) / (H * 0.50);
+        return Math.max(0, Math.min(1, 1 - Math.sqrt(dx*dx + dy*dy)));
+    }
+
+    /**
+     * Dual-zone Ishihara mosaic render:
+     * - Person zone: large warm-tone pixels (hue shifts with steer)
+     * - Background: small pure-grayscale pixels
+     */
+    function renderMosaicFrame() {
+        if (!cameraActive || !cameraVideo || cameraVideo.readyState < 2) {
+            mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
+            return;
+        }
+
+        frameCount++;
+        const W = mosaicCanvas.width;
+        const H = mosaicCanvas.height;
+
+        // Pixel sizes — 5:1 ratio for dramatic zone contrast
+        const fgBase = mosaicPixelSize;
+        const bgBase = Math.max(4, Math.round(fgBase * 0.20));
+
+        // ±1px jitter (live masking feel)
+        const jitter   = Math.sin(frameCount * 0.05);
+        const fgPixSize = Math.max(8, Math.round(fgBase + jitter));
+        const bgPixSize = Math.max(4, Math.round(bgBase + jitter * 0.3));
+
+        // Grab camera frame
+        offCanvas.width = W;
+        offCanvas.height = H;
+        offCtx.drawImage(cameraVideo, 0, 0, W, H);
+        let imageData;
+        try {
+            imageData = offCtx.getImageData(0, 0, W, H);
+        } catch(e) {
+            mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
+            return;
+        }
+        const data = imageData.data;
+
+        // Sample average colour of a rect
+        function sampleRect(sx, sy, sw, sh) {
+            let rr = 0, gg = 0, bb = 0, n = 0;
+            const x0 = Math.max(0, sx), y0 = Math.max(0, sy);
+            const x1 = Math.min(W-1, sx+sw-1), y1 = Math.min(H-1, sy+sh-1);
+            for (let py = y0; py <= y1; py += 2) {
+                for (let px = x0; px <= x1; px += 2) {
+                    const i = (py * W + px) * 4;
+                    rr += data[i]; gg += data[i+1]; bb += data[i+2]; n++;
+                }
+            }
+            return n ? [rr/n, gg/n, bb/n] : [128,128,128];
+        }
+
+        // Clear with pure black gap
+        mosaicCtx.fillStyle = '#000';
+        mosaicCtx.fillRect(0, 0, W, H);
+
+        // Build hue-shifted FG palette (steer-driven)
+        const FG_PALETTE = buildFgPalette();
+        const gap = 1;
+
+        // BG pass — cold-toned small pixels
+        for (let y = 0; y < H; y += bgPixSize) {
+            for (let x = 0; x < W; x += bgPixSize) {
+                const fg = getForegroundness(x + bgPixSize/2, y + bgPixSize/2, W, H);
+                if (fg > 0.5) continue;
+                const [r, g, b] = sampleRect(x, y, bgPixSize, bgPixSize);
+                const [qr, qg, qb] = quantize(r, g, b, BG_PALETTE);
+                mosaicCtx.fillStyle = `rgb(${qr},${qg},${qb})`;
+                mosaicCtx.fillRect(x+gap, y+gap, bgPixSize-gap*2, bgPixSize-gap*2);
+            }
+        }
+
+        // FG pass — speed-coded thermal pixels mapped from luminance
+        for (let y = 0; y < H; y += fgPixSize) {
+            for (let x = 0; x < W; x += fgPixSize) {
+                const fg = getForegroundness(x + fgPixSize/2, y + fgPixSize/2, W, H);
+                if (fg < 0.15) continue;
+                const [r, g, b] = sampleRect(x, y, fgPixSize, fgPixSize);
+                
+                // Direct thermal mapping based on cell luminance (brightness)
+                const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+                const colorIdx = Math.min(5, Math.floor(lum * 6));
+                const [qr, qg, qb] = FG_PALETTE[colorIdx];
+
+                mosaicCtx.globalAlpha = Math.min(1, fg * 1.5);
+                const bm = 0.6 + lum * 0.7;
+                mosaicCtx.fillStyle = `rgb(${Math.min(255,Math.round(qr*bm))},${Math.min(255,Math.round(qg*bm))},${Math.min(255,Math.round(qb*bm))})`;
+                mosaicCtx.fillRect(x+gap, y+gap, fgPixSize-gap*2, fgPixSize-gap*2);
+                mosaicCtx.globalAlpha = 1;
+            }
+        }
+
+        mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
+    }
+
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
+            cameraVideo.srcObject = stream;
+            await cameraVideo.play();
+            cameraActive = true;
+
+            if (cameraPermOverlay) {
+                cameraPermOverlay.style.opacity = '0';
+                setTimeout(() => { cameraPermOverlay.style.display = 'none'; }, 400);
+            }
+            if (mosaicControlBadge) {
+                mosaicControlBadge.style.opacity = '1';
+                mosaicControlBadge.style.pointerEvents = 'auto';
+            }
+            if (mosaicSpeedIndicator) mosaicSpeedIndicator.classList.add('visible');
+
+            // Show foreground zone hint briefly
+            const hint = document.getElementById('fg-zone-hint');
+            if (hint) {
+                hint.classList.add('visible');
+                setTimeout(() => hint.classList.remove('visible'), 4000);
+            }
+
+            // Show Ishihara legend
+            const legend = document.getElementById('ishihara-legend');
+            if (legend) legend.classList.add('visible');
+
+            renderMosaicFrame();
+        } catch (err) {
+            console.warn('Camera denied:', err);
+            if (cameraPermOverlay) {
+                const p = cameraPermOverlay.querySelector('.camera-permission-box p');
+                if (p) p.textContent = '카메라 접근이 거부되었습니다. 브라우저 설정에서 허용해 주세요.';
+            }
+        }
+    }
+
+    let manualOverrideTimeout = null;
+    const handleSliderInput = e => {
+        state.manualOverride = true;
+        const val = parseInt(e.target.value);
+        mosaicPixelSize = val;
+        if (mosaicValDisplay) mosaicValDisplay.textContent = `${val}px`;
+        if (mosaicSpeedPx)    mosaicSpeedPx.textContent = `${val}px`;
+        console.log(`Manual override active: mosaic pixel size set to ${val}px`);
+
+        clearTimeout(manualOverrideTimeout);
+        manualOverrideTimeout = setTimeout(() => {
+            state.manualOverride = false;
+            console.log('Manual override inactive: resuming auto speed scaling');
+        }, 4000); // Resume auto scaling after 4 seconds of slider inactivity
+    };
+    mosaicSlider?.addEventListener('input', handleSliderInput);
+    mosaicSlider?.addEventListener('change', handleSliderInput);
+    btnRequestCamera?.addEventListener('click', startCamera);
+    startCamera();
+
+    // =========================================================================
+    // DYNAMIC ISLAND
+    // =========================================================================
+    islandTrigger?.addEventListener('click', () => {
+        if (simIsland?.classList.contains('minimized')) {
+            simIsland.classList.remove('minimized');
+            simIsland.classList.add('expanded');
+        }
+    });
+    btnIslandMinimize?.addEventListener('click', e => {
+        e.stopPropagation();
+        if (simIsland?.classList.contains('expanded')) {
+            simIsland.classList.remove('expanded');
+            simIsland.classList.add('minimized');
+        }
+    });
+
+    // =========================================================================
+    // SPEED-LINE PARTICLES
+    // =========================================================================
+    const particles = [];
+    const maxParticles = 35;
+
+    class Particle {
+        constructor() { this.reset(true); }
+        reset(anywhere = false) {
+            this.x = anywhere
+                ? Math.random() * (particleCanvas?.width || 500)
+                : (particleCanvas?.width || 500) + Math.random() * 50;
+            this.y = Math.random() * (particleCanvas?.height || 400);
+            this.length = 40 + Math.random() * 60;
+            this.speedFactor = 0.9 + Math.random() * 1.5;
+            this.opacity = 0.15 + Math.random() * 0.45;
+            this.width = 1.2 + Math.random() * 1.8;
+            this.color = Math.random() > 0.5 ? '255,255,255' : '0,113,227';
+        }
+        update(speedVal, on) {
+            if (!on || speedVal <= 0) {
+                this.opacity -= 0.015;
+                if (this.opacity <= 0) { this.reset(); this.opacity = 0; }
+            } else {
+                this.x -= (speedVal * 0.5 + 4) * this.speedFactor;
+                if (this.opacity < 0.6) this.opacity += 0.03;
+            }
+            if (this.x < -this.length) this.reset(false);
+        }
+        draw() {
+            if (!pCtx || this.opacity <= 0) return;
+            pCtx.beginPath();
+            const g = pCtx.createLinearGradient(this.x, this.y, this.x + this.length, this.y);
+            g.addColorStop(0, `rgba(${this.color},${this.opacity})`);
+            g.addColorStop(1, `rgba(${this.color},0)`);
+            pCtx.strokeStyle = g;
+            pCtx.lineWidth = this.width;
+            pCtx.moveTo(this.x, this.y);
+            pCtx.lineTo(this.x + this.length, this.y);
+            pCtx.stroke();
+        }
+    }
+    for (let i = 0; i < maxParticles; i++) particles.push(new Particle());
+
+    // =========================================================================
+    // LIKE BURST ANIMATION
+    // =========================================================================
+    const heartBurstContainer = document.getElementById('heart-burst-container');
+    function spawnFloatingHeart() {
+        if (!heartBurstContainer) return;
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart';
+
+        // Create programmatic circular Facebook Like badge SVG
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 36 36');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+
+        // Draw blue circular background
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', '18');
+        circle.setAttribute('cy', '18');
+        circle.setAttribute('r', '18');
+        circle.setAttribute('fill', '#1877f2');
+        svg.appendChild(circle);
+
+        // Draw white thumbs up path (scaled and centered inside)
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z');
+        path.setAttribute('fill', '#ffffff');
+        path.setAttribute('transform', 'translate(9, 9) scale(0.75)');
+        svg.appendChild(path);
+
+        heart.appendChild(svg);
+
+        // Randomize initial horizontal position within container (wide dispersion)
+        const leftOffset = Math.random() * 120 - 60; // -60px to +60px from center
+        heart.style.left = `calc(50% + ${leftOffset}px)`;
+
+        // Randomize size of the badge (width/height from 20px to 36px)
+        const size = 20 + Math.random() * 16;
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+
+        // Randomize scales for 3D depth variety
+        const scale0 = 0.5 + Math.random() * 0.3;
+        const scale1 = 1.0 + Math.random() * 0.4;
+
+        // Randomize sway values using css variables (wide horizontal sways)
+        const sway1 = Math.random() * 60 - 30;   // -30px to 30px
+        const sway2 = Math.random() * 100 - 50;  // -50px to 50px
+        const sway3 = Math.random() * 140 - 70;  // -70px to 70px
+
+        const rot1 = Math.random() * 60 - 30;   // -30deg to 30deg
+        const rot2 = Math.random() * 120 - 60;  // -60deg to 60deg
+        const rot3 = Math.random() * 180 - 90;  // -90deg to 90deg
+
+        const duration = 2.0 + Math.random() * 1.5; // 2s to 3.5s
+
+        heart.style.setProperty('--scale-0', scale0.toString());
+        heart.style.setProperty('--scale-1', scale1.toString());
+        heart.style.setProperty('--sway-1', `${sway1}px`);
+        heart.style.setProperty('--sway-2', `${sway2}px`);
+        heart.style.setProperty('--sway-3', `${sway3}px`);
+        heart.style.setProperty('--rot-1', `${rot1}deg`);
+        heart.style.setProperty('--rot-2', `${rot2}deg`);
+        heart.style.setProperty('--rot-3', `${rot3}deg`);
+        heart.style.animationDuration = `${duration}s`;
+
+        heartBurstContainer.appendChild(heart);
+
+        // Remove from DOM when animation ends
+        setTimeout(() => {
+            heart.remove();
+        }, duration * 1000);
+    }
+
+    // =========================================================================
+    // REACTION COUNTER ANIMATION (ride duration driven)
+    // =========================================================================
+    function formatNum(n) {
+        if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+        return String(Math.floor(n));
+    }
+
+    let lastPopTime = 0;
+    function updateReactionCounts() {
+        if (!state.isOperating || !state.rideStartTime) return;
+        const elapsed = state.rideDurationSec;
+
+        // Counts grow proportional to ride time
+        const likes    = state.baseLikes    + Math.floor(elapsed * 2.5);
+        const comments = state.baseComments + Math.floor(elapsed * 0.4);
+        const shares   = state.baseShares   + Math.floor(elapsed * 0.1);
+
+        if (likeCountNum)    likeCountNum.textContent    = formatNum(likes);
+        if (commentCountNum) commentCountNum.textContent = formatNum(comments);
+        if (shareCountNum)   shareCountNum.textContent   = formatNum(shares);
+
+        // Pop animation every ~2 seconds (visible count-increment hint)
+        const now = Date.now();
+        if (now - lastPopTime > 2000 && state.speed >= LIVE_SPEED_THRESHOLD) {
+            lastPopTime = now;
+            [likeCountNum, commentCountNum, shareCountNum].forEach(el => {
+                if (!el) return;
+                el.classList.remove('count-popping');
+                void el.offsetWidth; // force reflow
+                el.classList.add('count-popping');
+                setTimeout(() => el.classList.remove('count-popping'), 280);
+            });
+        }
+    }
+
+    // =========================================================================
+    // AUTO-COMPLETED RIDE CARD
+    // =========================================================================
+    const ROUTE_NAMES = [
+        'Mapo River Cruise', 'Yeouido Night Ride', 'Banpo Bridge Loop',
+        'Olympic Park Sprint', 'Ttukseom Riverside', 'Hongdae Night Tour',
+    ];
+
+    function showCompletedCard() {
+        if (!completedCard || state.completedCardShown) return;
+        state.completedCardShown = true;
+
+        const distKm = state.totalDistanceKm.toFixed(1);
+        const avgSpeed = state.speedSamples.length
+            ? Math.round(state.speedSamples.reduce((a,b)=>a+b,0) / state.speedSamples.length)
+            : 0;
+        const zone = LOCATION_ZONES[currentZoneIndex];
+        const routeName = ROUTE_NAMES[currentZoneIndex % ROUTE_NAMES.length];
+        const durationMin = Math.floor(state.rideDurationSec / 60);
+
+        if (completedLocName)  completedLocName.textContent  = zone.name;
+        if (completedRouteName) completedRouteName.textContent = routeName;
+        if (completedStats)    completedStats.innerHTML      =
+            `🛣 ${distKm} km Completed &nbsp;·&nbsp; ⚡ Avg ${avgSpeed} km/h`;
+        if (completedCaption)  completedCaption.textContent  =
+            `${durationMin}분간의 라이딩 완료! ${distKm}km를 달렸어요. 시스템이 자동으로 기록했습니다 🛴✨`;
+        if (completedTimestamp) completedTimestamp.textContent = 'Just now · 🌍';
+
+        // Reveal with slide-in animation
+        completedCard.style.display = 'flex';
+        completedCard.style.flexDirection = 'column';
+        completedCard.style.opacity = '0';
+        completedCard.style.transform = 'translateY(20px)';
+        completedCard.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        setTimeout(() => {
+            completedCard.style.opacity = '1';
+            completedCard.style.transform = 'translateY(0)';
+        }, 50);
+    }
+
+    // =========================================================================
+    // LIVE / OFFLINE AUTO TOGGLE
+    // =========================================================================
+    const LIVE_SPEED_THRESHOLD = 5; // km/h — above this = LIVE
+
+    function checkLiveToggle() {
+        const postRideBadge = document.getElementById('post-ride-badge');
+        const isLive = state.isOperating && state.speed >= LIVE_SPEED_THRESHOLD;
+
+        if (isLive && !state.wasLive) {
+            // Transition to LIVE
+            state.wasLive = true;
+            state.rideStartTime = Date.now();
+            state.completedCardShown = false;
+        } else if (!isLive && state.wasLive && state.speed === 0 && state.isOperating) {
+            // Ride stopped: auto-generate completed card
+            state.wasLive = false;
+            showCompletedCard();
+        }
+
+        if (postRideBadge) {
+            if (isLive) {
+                postRideBadge.textContent = '● LIVE';
+                postRideBadge.className = 'fb-live-badge';
+            } else if (state.isOperating && state.speed > 0) {
+                postRideBadge.textContent = 'STARTING';
+                postRideBadge.className = 'fb-live-badge';
+                postRideBadge.style.background = '#ff9500';
+            } else {
+                postRideBadge.textContent = 'OFFLINE';
+                postRideBadge.className = 'fb-completed-badge';
+                postRideBadge.style.background = '';
+            }
+        }
+    }
+
+    // =========================================================================
+    // MAIN ANIMATION LOOP
+    // =========================================================================
+    function loop(timestamp) {
+        const dt = Math.min((timestamp - state.lastTime) / 1000, 0.1); // cap at 100ms
+        state.lastTime = timestamp;
+ 
+        // Auto-simulate active riding state: smooth speed & rotation curves
+        if (state.isOperating) {
+            if (!state.simManualOverride) {
+                state.speed = 24.5 + Math.sin(Date.now() / 6000) * 8.5;
+                state.rotation = Math.sin(Date.now() / 3200) * 35;
+            }
+        } else {
+            state.speed = 0;
+            state.rotation = 0;
+        }
+ 
+        // --- 1. SPEED: Accumulate ride telemetry ---
+        if (state.isOperating && state.speed > 0) {
+            state.rideDurationSec += dt;
+            state.speedSamples.push(state.speed);
+            // Cap samples array to avoid memory growth
+            if (state.speedSamples.length > 3600) state.speedSamples.shift();
+        }
+ 
+        // --- 2. STEER: Palette hue shift ---
+        // rotation -90..90 → hue target -20..+20 degrees
+        const targetHue = state.rotation * (20 / 90);
+        state.paletteHueShift += (targetHue - state.paletteHueShift) * 0.08;
+ 
+        // --- 3. GPS integration ---
+        updateGPS(dt);
+ 
+        // --- 4. Particle speed lines (removed as requested) ---
+        if (pCtx && particleCanvas) {
+            pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        }
+ 
+        // --- 5. SPEED → Mosaic pixel size (auto when no manual override) ---
+        if (!state.manualOverride) {
+            const autoSize = speedToMosaicSize(state.speed);
+            mosaicPixelSize = autoSize;
+            if (mosaicSlider)       mosaicSlider.value          = autoSize;
+            if (mosaicValDisplay)   mosaicValDisplay.textContent = `${autoSize}px`;
+        }
+        if (mosaicSpeedPx) {
+            mosaicSpeedPx.textContent = `${mosaicPixelSize}px`;
+        }
+ 
+        // --- 6. Steer glow indicators ---
+        if (leftGlow && rightGlow) {
+            const abs = Math.abs(state.rotation);
+            if (state.rotation < -12) {
+                leftGlow.style.opacity  = Math.min(0.8, (abs - 12) / 45).toString();
+                rightGlow.style.opacity = '0';
+            } else if (state.rotation > 12) {
+                rightGlow.style.opacity = Math.min(0.8, (abs - 12) / 45).toString();
+                leftGlow.style.opacity  = '0';
+            } else {
+                leftGlow.style.opacity = rightGlow.style.opacity = '0';
+            }
+        }
+ 
+        // --- 7. SPEED + STEER → Feed scroll ---
+        // Speed adds base forward scroll, steer adds directional component
+        if (feedMainLayout) {
+            let targetScroll = 0;
+            if (state.isOperating && state.speed > 0) {
+                // Speed contributes a gentle forward drift
+                targetScroll += state.speed * 0.25;
+            }
+            if (Math.abs(state.rotation) > 3) {
+                // Steer adds directional scroll (positive = down, negative = up)
+                targetScroll += state.rotation * 6.5;
+            }
+            state.currentScrollSpeed += (targetScroll - state.currentScrollSpeed) * 0.12;
+            if (Math.abs(state.currentScrollSpeed) > 0.15) {
+                feedMainLayout.scrollTop += state.currentScrollSpeed * dt;
+            }
+        }
+ 
+        // --- 8. LIVE toggle check ---
+        checkLiveToggle();
+ 
+        // --- 9. Reaction count animation (ride duration) ---
+        updateReactionCounts();
+
+        // --- 10. Real-time Heart/Like Burst ---
+        if (state.isOperating && state.speed > 0) {
+            state.heartAccumulator += dt;
+            const spawnInterval = 1 / (state.speed * 0.15 + 0.1);
+            if (state.heartAccumulator >= spawnInterval) {
+                spawnFloatingHeart();
+                state.heartAccumulator = 0;
+            }
+        }
+
+        // --- 11. Real-time UI Update ---
+        updateUI();
+ 
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // =========================================================================
+    // UI UPDATERS
+    // =========================================================================
+    function updateUI() {
+        if (simInputSpeed)    simInputSpeed.value    = state.speed;
+        if (simInputRotation) simInputRotation.value = state.rotation;
+
+        if (simValSpeed)    simValSpeed.textContent    = `${state.speed} km/h`;
+        if (simValRotation) simValRotation.textContent = `${state.rotation}°`;
+
+        if (islandStatSpeed) islandStatSpeed.textContent = `${state.speed.toFixed(1)} km/h`;
+        if (islandStatRot)   islandStatRot.textContent   = `${Math.round(state.rotation)}°`;
+
+        if (overlaySpeed)    overlaySpeed.textContent    = `${state.speed.toFixed(1)} km/h`;
+        if (overlayRotation) overlayRotation.textContent = `${Math.round(state.rotation)}°`;
+
+        if (overlayStatusIndicator) {
+            if (state.isOperating) {
+                const isLive = state.speed >= LIVE_SPEED_THRESHOLD;
+                overlayStatusIndicator.textContent  = isLive ? 'LIVE' : (state.speed > 0 ? 'STARTING' : 'STATIONARY');
+                overlayStatusIndicator.className    = 'hud-item status-indicator' + (state.speed > 0 ? ' active' : '');
+            } else {
+                overlayStatusIndicator.textContent = 'OFFLINE';
+                overlayStatusIndicator.className   = 'hud-item status-indicator';
+            }
+        }
+
+        // Update Like Infographic telemetry
+        if (infoValSpeed)    infoValSpeed.textContent    = `${state.speed.toFixed(1)} km/h`;
+        if (infoValSteer)    infoValSteer.textContent    = `${Math.round(state.rotation)}°`;
+        if (infoValDist)     infoValDist.textContent     = `${state.totalDistanceKm.toFixed(2)} km`;
+        if (infoValDuration) infoValDuration.textContent = `${Math.floor(state.rideDurationSec)}s`;
+        if (infoValLoc) {
+            const zone = LOCATION_ZONES[currentZoneIndex];
+            infoValLoc.textContent = `📍 ${zone ? zone.name : 'Seoul'}`;
+        }
+    }
+
+    // =========================================================================
+    // POWER STATE
+    // =========================================================================
+    function setPowerState(on) {
+        state.isOperating = on;
+        if (!on) {
+            state.speed = 0;
+            state.rotation = 0;
+            // If we were live, trigger completed card
+            if (state.wasLive) {
+                state.wasLive = false;
+                showCompletedCard();
+            }
+            // Reset GPS state for new session
+            state.totalDistanceKm = 0;
+            state.speedSamples    = [];
+            state.rideDurationSec = 0;
+            state.rideStartTime   = null;
+            currentZoneIndex = 0;
+            if (postLocationTag) postLocationTag.style.display = 'none';
+        }
+        simBtnPower?.classList[on ? 'add' : 'remove']('active');
+        if (simBtnPower) simBtnPower.textContent = on ? 'STOP' : 'START';
+        updateUI();
+    }
+
+    // =========================================================================
+    // EVENT BINDINGS
+    // =========================================================================
+    let simOverrideTimeout = null;
+    function triggerSimManualOverride() {
+        state.simManualOverride = true;
+        clearTimeout(simOverrideTimeout);
+        simOverrideTimeout = setTimeout(() => {
+            state.simManualOverride = false;
+        }, 8000); // Resume auto simulation after 8 seconds of inactivity
+    }
+
+    simBtnPower?.addEventListener('click', () => {
+        setPowerState(!state.isOperating);
+        if (state.isOperating) {
+            state.simManualOverride = false; // Reset override on power on
+        }
+    });
+
+    simInputSpeed?.addEventListener('input', e => {
+        const val = parseInt(e.target.value);
+        if (val > 0 && !state.isOperating) setPowerState(true);
+        state.speed = val;
+        triggerSimManualOverride();
+        updateUI();
+    });
+
+    simInputRotation?.addEventListener('input', e => {
+        state.rotation = parseInt(e.target.value);
+        triggerSimManualOverride();
+        updateUI();
+    });
+
+    // Preset: City Cruise
+    simPresetCruise?.addEventListener('click', () => {
+        if (!state.isOperating) setPowerState(true);
+        state.speed    = 25;
+        state.rotation = 0;
+        triggerSimManualOverride();
+        updateUI();
+    });
+
+    // Preset: Steer Curve
+    simPresetCurve?.addEventListener('click', () => {
+        if (!state.isOperating) setPowerState(true);
+        state.speed    = 35;
+        state.rotation = 40;
+        triggerSimManualOverride();
+        updateUI();
+    });
+
+    // Preset: Stop → triggers completed card if was LIVE
+    simPresetStop?.addEventListener('click', () => {
+        if (state.wasLive) {
+            state.wasLive = false;
+            showCompletedCard();
+        }
+        state.speed    = 0;
+        state.rotation = 0;
+        triggerSimManualOverride();
+        updateUI();
+    });
+
+    // Toggle Like button active state
+    btnLikePost?.addEventListener('click', (e) => {
+        e.preventDefault();
+        btnLikePost.classList.toggle('active');
+    });
+
+    window.state = state;
+    updateUI();
+});
