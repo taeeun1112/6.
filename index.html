@@ -4,400 +4,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook</title>
-    <meta name="description" content="Facebook - 친구, 가족과 소통하고 좋아하는 것들을 공유하세요.">
+    <title>Instagram</title>
+    <meta name="description" content="Instagram - 사진과 동영상을 공유하고 소통해보세요.">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!-- ===== FACEBOOK HEADER ===== -->
-    <header class="fb-header" id="main-navbar">
-        <div class="fb-header-inner">
-            <div class="fb-header-left">
-                <a href="#" class="fb-logo" id="brand-logo">facebook</a>
+    <!-- ===== PHYSICAL MOBILE DEVICE MOCK SHELL ===== -->
+    <div class="instagram-mobile-shell">
+        <div class="phone-notch"></div>
+        <div class="phone-speaker"></div>
+        <div class="phone-camera"></div>
+
+        <!-- ===== INSTAGRAM HEADER ===== -->
+        <header class="instagram-header" id="main-navbar">
+            <div class="instagram-header-inner">
+                <button class="instagram-back-btn" onclick="alert('뒤로 가기')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="instagram-header-title" id="brand-logo">
+                    <span class="instagram-title-main">게시물</span>
+                    <span class="instagram-title-sub">undefined_letpreartist</span>
+                </div>
+                <button class="instagram-menu-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-icon">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== MAIN PAGE VIEWPORT ===== -->
+        <div class="fb-page-wrap">
+            
+            <!-- Hidden Left Sidebar (kept for compatibility with any CSS selectors, display: none in CSS) -->
+            <aside class="fb-left-sidebar" style="display: none;"></aside>
+
+            <!-- ===== CENTER INSTAGRAM FEED ===== -->
+            <main class="fb-center-feed" id="fb-center-feed">
+
+                <!-- ===== POST 1: LIVE RIDE ISHIHARA MOSAIC ===== -->
+                <article class="instagram-post-card featured-post" id="passenger-post-card">
+                    
+                    <!-- Post Header: User Profile Info -->
+                    <div class="instagram-post-user-row">
+                        <div class="instagram-user-avatar-wrap">
+                            <div class="instagram-user-avatar-story-ring">
+                                <div class="instagram-user-avatar-inner">
+                                    <span class="instagram-avatar-letter">U</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="instagram-user-info">
+                            <div class="instagram-username-line">
+                                <a href="#" class="instagram-post-author-name">undefined_letpreartist</a>
+                                <span class="instagram-post-location-tag" id="post-location-tag">📍 Mapo River 🌉</span>
+                            </div>
+                        </div>
+                        <div class="instagram-live-badge-wrap">
+                            <div class="fb-live-badge" id="post-ride-badge">● LIVE</div>
+                        </div>
+                        <button class="instagram-post-options-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="options-dots-icon">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="19" cy="12" r="1"></circle>
+                                <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Post Media: Color Blindness Test (Ishihara Mosaic) -->
+                    <div class="fb-post-media" id="passenger-media-container">
+                        <!-- Hidden video for camera stream -->
+                        <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
+
+                        <!-- Mosaic canvas: pixelated live camera feed -->
+                        <canvas id="mosaic-canvas" class="mosaic-canvas-layer"></canvas>
+
+                        <!-- Speed line particle canvas overlay (hidden/cleared by JS) -->
+                        <canvas id="riding-particles-canvas"></canvas>
+
+                        <!-- HUD Overlay -->
+                        <div class="hud-capsule shadow-sm">
+                            <div class="hud-item">
+                                <span class="lbl">SPEED</span>
+                                <strong id="overlay-speed">0.0 km/h</strong>
+                            </div>
+                            <div class="hud-separator"></div>
+                            <div class="hud-item">
+                                <span class="lbl">STEER</span>
+                                <strong id="overlay-rotation">0°</strong>
+                            </div>
+                            <div class="hud-separator"></div>
+                            <div class="hud-item status-indicator" id="overlay-status-indicator">STATIONARY</div>
+                        </div>
+
+                        <!-- Camera Permission Overlay -->
+                        <div class="camera-permission-overlay" id="camera-permission-overlay">
+                            <div class="camera-permission-box">
+                                <div class="camera-icon-wrap">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z" fill="currentColor" />
+                                        <path d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <h3>카메라 접근 필요</h3>
+                                <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
+                                <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
+                            </div>
+                        </div>
+
+                        <!-- Steer Edge Glows -->
+                        <div class="steer-glow-indicator left-glow" id="left-steer-glow"></div>
+                        <div class="steer-glow-indicator right-glow" id="right-steer-glow"></div>
+
+                        <!-- Foreground zone ellipse hint -->
+                        <div class="fg-zone-hint" id="fg-zone-hint"></div>
+
+                        <!-- Mosaic Intensity Control (Ishihara Mode) -->
+                        <div class="mosaic-control-badge" id="mosaic-control-badge">
+                            <span class="mosaic-label">👤 PERSON PX</span>
+                            <input type="range" id="mosaic-intensity" min="12" max="36" value="20" class="mosaic-slider">
+                            <span id="mosaic-val">20px</span>
+                        </div>
+                    </div>
+
+                    <!-- Page Indicators (Carousel Dots) -->
+                    <div class="instagram-carousel-dots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="instagram-post-actions-row">
+                        <div class="left-actions">
+                            <button class="instagram-action-btn like-btn active" id="btn-like-post">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon stroke-heart">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                            <button class="instagram-action-btn" id="btn-comment-post">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon">
+                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-7.6 4.7c-1.3 0-2.6-.4-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="instagram-action-btn repost-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon">
+                                    <path d="M17 1v3H1v8h3V7h13v3l5-4.5L17 1zM7 23v-3h16v-8h-3v5H7v-3l-5 4.5L7 23z"></path>
+                                </svg>
+                                <span class="repost-count">2</span>
+                            </button>
+                            <button class="instagram-action-btn" id="btn-share-post">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="instagram-action-btn save-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </button>
+                        <!-- Dynamic Like Burst Container -->
+                        <div id="heart-burst-container" class="heart-burst-container"></div>
+                    </div>
+
+                    <!-- Likes Row -->
+                    <div class="instagram-likes-row">
+                        <span class="fb-reaction-count" id="like-count-display">
+                            daekyeong_design님 외 <strong id="like-count-num">1,203</strong>명이 좋아합니다
+                        </span>
+                    </div>
+
+                    <!-- Caption & Description Row -->
+                    <div class="instagram-caption-row">
+                        <div class="instagram-caption-content">
+                            <a href="#" class="caption-username">undefined_letpreartist</a>
+                            <span class="caption-text">2026 한국문화예술위원회 예비예술인 지원사업</span>
+                        </div>
+                        <div class="instagram-caption-sub">
+                            융복합 미디어아트 전시 【Undefined... <span class="more-btn">더 보기</span>
+                        </div>
+                        
+                        <!-- Telemetry Caption -->
+                        <div class="instagram-telemetry-caption">
+                            드디어 신형 모빌리티 라이딩 기능 테스트 중! 실시간 모자이크 카메라 피드로 주행 영상 공유 중 🛴💨<br>
+                            <span class="instagram-post-tags">#미래모빌리티 #애플디자인 #인터랙티브UI #라이드쉐어</span>
+                        </div>
+
+                        <!-- Comments section link -->
+                        <div class="instagram-comments-teaser">
+                            댓글 <span id="comment-count-num">88</span>개 모두 보기
+                        </div>
+
+                        <!-- Post Date -->
+                        <div class="instagram-post-date">
+                            8월 4일
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ===== POST 2: AUTO-GENERATED COMPLETED RIDE CARD ===== -->
+                <article class="instagram-post-card completed-post" id="completed-ride-card" style="display:none;">
+                    <div class="instagram-post-user-row">
+                        <div class="instagram-user-avatar-wrap">
+                            <div class="instagram-user-avatar-inner">
+                                <span class="instagram-avatar-letter">U</span>
+                            </div>
+                        </div>
+                        <div class="instagram-user-info">
+                            <div class="instagram-username-line">
+                                <a href="#" class="instagram-post-author-name">undefined_letpreartist</a>
+                                <span class="instagram-post-action-text">님이 라이딩을 완료했습니다</span>
+                            </div>
+                            <div class="instagram-post-location-tag-completed">
+                                📍 <span id="completed-location-name">Seoul</span>
+                            </div>
+                        </div>
+                        <div class="instagram-completed-badge-wrap">
+                            <span class="instagram-completed-badge">COMPLETED</span>
+                        </div>
+                    </div>
+
+                    <div class="instagram-post-map-container">
+                        <div class="fb-map-graphic">
+                            <div class="fb-map-overlay-text">
+                                <h3 id="completed-route-name">Ride Complete</h3>
+                                <p id="completed-stats">🛣 0.0 km Completed &nbsp;·&nbsp; ⚡ Avg 0 km/h</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons for Completed Post -->
+                    <div class="instagram-post-actions-row">
+                        <div class="left-actions">
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7c-1.3 0-2.6-.4-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></button>
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+                        </div>
+                        <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="action-icon"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+                    </div>
+
+                    <div class="instagram-caption-row">
+                        <div class="instagram-caption-content">
+                            <a href="#" class="caption-username">undefined_letpreartist</a>
+                            <span class="caption-text" id="completed-caption">라이딩 완료! 시스템이 자동으로 기록했습니다 🛴✨</span>
+                        </div>
+                        <div class="instagram-post-date" id="completed-timestamp">
+                            Just now · 🌍
+                        </div>
+                    </div>
+                </article>
+
+            </main>
+
+            <!-- Hidden Right Sidebar (kept for selectors) -->
+            <aside class="fb-right-sidebar" style="display: none;"></aside>
+        </div>
+
+        <!-- ===== DYNAMIC ISLAND CONTROLLER ===== -->
+        <div class="dynamic-island-wrapper minimized" id="sim-island">
+            <!-- Minimized State Bar -->
+            <div class="island-min-bar" id="island-trigger">
+                <span class="island-pulse-dot"></span>
+                <span class="island-min-text">MOBILITY CONTROLLER</span>
+                <div class="island-min-stats">
+                    <span id="island-stat-speed">0.0 km/h</span>
+                    <span class="island-divider">|</span>
+                    <span id="island-stat-rot">0°</span>
+                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="island-chevron">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+
+            <!-- Expanded Control Panel -->
+            <div class="island-expanded-panel">
+                <div class="island-header">
+                    <h3>Mobility Simulator</h3>
+                    <button class="btn-island-close" id="btn-island-minimize">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="island-body">
+                    <div class="island-row">
+                        <span class="label">ENGINE STATE</span>
+                        <button class="btn-toggle-engine active" id="sim-btn-power">STOP</button>
+                    </div>
+                    
+                    <div class="island-slider-item">
+                        <div class="slider-info">
+                            <span>Simulated Speed</span>
+                            <strong id="sim-val-speed">0 km/h</strong>
+                        </div>
+                        <input type="range" id="sim-input-speed" min="0" max="60" value="0" class="apple-range-slider">
+                    </div>
+
+                    <div class="island-slider-item">
+                        <div class="slider-info">
+                            <span>Steering Angle</span>
+                            <strong id="sim-val-rotation">0°</strong>
+                        </div>
+                        <input type="range" id="sim-input-rotation" min="-90" max="90" value="0" class="apple-range-slider">
+                    </div>
+
+                    <div class="island-presets-group">
+                        <button class="btn-island-preset" id="sim-preset-cruise">Cruise</button>
+                        <button class="btn-island-preset" id="sim-preset-curve">Curve</button>
+                        <button class="btn-island-preset" id="sim-preset-stop">Stop</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- ===== 3-COLUMN PAGE LAYOUT ===== -->
-    <div class="fb-page-wrap">
-
-        <!-- ===== LEFT SIDEBAR ===== -->
-        <aside class="fb-left-sidebar">
-            <div class="fb-sidebar-profile-link">
-                <span class="fb-sidebar-name">Tae Eun</span>
-            </div>
-
-            <nav class="fb-sidebar-nav">
-                <a href="#" class="fb-sidebar-link active" id="sidebar-newsfeed">
-                    <span class="fb-sidebar-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                        </svg>
-                    </span>
-                    News Feed
-                </a>
-                <a href="#" class="fb-sidebar-link" id="sidebar-messages">
-                    <span class="fb-sidebar-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd"
-                                d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </span>
-                    Messages
-                    <span class="fb-sidebar-badge">2</span>
-                </a>
-                <a href="#" class="fb-sidebar-link" id="sidebar-events">
-                    <span class="fb-sidebar-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </span>
-                    Events
-                </a>
-                <a href="#" class="fb-sidebar-link" id="sidebar-groups">
-                    <span class="fb-sidebar-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                        </svg>
-                    </span>
-                    Groups
-                </a>
-                <a href="#" class="fb-sidebar-link" id="sidebar-photos">
-                    <span class="fb-sidebar-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </span>
-                    Photos
-                </a>
-                <a href="#" class="fb-sidebar-link" id="sidebar-games">
-                    <span class="fb-sidebar-icon">🎮</span>
-                    Games
-                </a>
-            </nav>
-
-            <div class="fb-sidebar-divider"></div>
-
-            <div class="fb-sidebar-section-title">FAVORITES</div>
-            <nav class="fb-sidebar-nav fb-sidebar-friends">
-                <a href="#" class="fb-sidebar-link fb-friend-link">
-                    <span class="fb-online-dot"></span> Ji Sun
-                </a>
-                <a href="#" class="fb-sidebar-link fb-friend-link">
-                    <span class="fb-online-dot"></span> Min Kyu
-                </a>
-                <a href="#" class="fb-sidebar-link fb-friend-link">
-                    <span class="fb-online-dot offline"></span> Seo Hyun
-                </a>
-                <a href="#" class="fb-sidebar-link fb-friend-link">
-                    <span class="fb-online-dot offline"></span> Ji Woo
-                </a>
-            </nav>
-
-            <div class="fb-sidebar-divider"></div>
-            <div class="fb-sidebar-footer">
-                <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Help</a><br>
-                <span>© 2012 Facebook</span>
-            </div>
-        </aside>
-
-        <!-- ===== CENTER NEWS FEED ===== -->
-        <main class="fb-center-feed" id="fb-center-feed">
-
-            <!-- ===== MAIN POST: CAMERA MOSAIC LIVE FEED ===== -->
-            <article class="fb-post-card featured-post" id="passenger-post-card">
-                <div class="fb-post-header">
-                    <div class="fb-post-meta" style="margin-left: 0;">
-                        <div class="fb-post-author-line">
-                            <a href="#" class="fb-post-author-name">Human Interfaced</a>
-                            <span class="fb-post-action-text">is Live Riding 🛴</span>
-                        </div>
-                        <div class="fb-post-timestamp">
-                            <span id="post-timestamp">Just now</span>
-                            · <span class="fb-globe-icon">🌍</span>
-                        </div>
-                    </div>
-                    <div class="fb-live-badge" id="post-ride-badge">● LIVE</div>
+        <!-- ===== INSTAGRAM BOTTOM TAB BAR ===== -->
+        <nav class="instagram-bottom-tabbar" id="fb-bottom-tabbar">
+            <a href="#" class="instagram-bottom-tab active" id="tab-home" title="Home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="nav-icon">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <a href="#" class="instagram-bottom-tab" id="tab-friends" title="Search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="nav-icon">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </a>
+            <a href="#" class="instagram-bottom-tab" id="tab-messages" title="Create">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="nav-icon">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+            <a href="#" class="instagram-bottom-tab" id="tab-notifications" title="Reels">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="nav-icon">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+            <a href="#" class="instagram-bottom-tab" id="tab-profile" title="Profile">
+                <div class="instagram-nav-profile-avatar">
+                    <span class="avatar-letter">U</span>
                 </div>
-
-                <!-- Camera + Mosaic Media Box -->
-                <div class="fb-post-media" id="passenger-media-container">
-                    <!-- Hidden video for camera stream -->
-                    <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
-
-                    <!-- Mosaic canvas: pixelated live camera feed -->
-                    <canvas id="mosaic-canvas" class="mosaic-canvas-layer"></canvas>
-
-                    <!-- Speed line particle canvas overlay -->
-                    <canvas id="riding-particles-canvas"></canvas>
-
-                    <!-- HUD Overlay -->
-                    <div class="hud-capsule shadow-sm">
-                        <div class="hud-item"><span class="lbl">SPEED</span> <strong id="overlay-speed">0.0
-                                km/h</strong></div>
-                        <div class="hud-separator"></div>
-                        <div class="hud-item"><span class="lbl">STEER</span> <strong id="overlay-rotation">0°</strong>
-                        </div>
-                        <div class="hud-separator"></div>
-                        <div class="hud-item status-indicator" id="overlay-status-indicator">STATIONARY</div>
-                    </div>
-
-                    <!-- Camera Permission Overlay -->
-                    <div class="camera-permission-overlay" id="camera-permission-overlay">
-                        <div class="camera-permission-box">
-                            <div class="camera-icon-wrap">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z"
-                                        fill="currentColor" />
-                                    <path
-                                        d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
-                                        fill="currentColor" />
-                                </svg>
-                            </div>
-                            <h3>카메라 접근 필요</h3>
-                            <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
-                            <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
-                        </div>
-                    </div>
-
-                    <!-- Steer Edge Glows -->
-                    <div class="steer-glow-indicator left-glow" id="left-steer-glow"></div>
-                    <div class="steer-glow-indicator right-glow" id="right-steer-glow"></div>
-
-                    <!-- Foreground zone ellipse hint (orange dashed ring around person area) -->
-                    <div class="fg-zone-hint" id="fg-zone-hint"></div>
-
-                    <!-- Mosaic Intensity Control (Ishihara Mode) -->
-                    <div class="mosaic-control-badge" id="mosaic-control-badge">
-                        <span class="mosaic-label">👤 PERSON PX</span>
-                        <input type="range" id="mosaic-intensity" min="12" max="36" value="20" class="mosaic-slider">
-                        <span id="mosaic-val">20px</span>
-                    </div>
-
-
-
-
-                </div>
-
-                <!-- Caption (moved below the media box) -->
-                <div class="fb-post-caption">
-                    드디어 신형 모빌리티 라이딩 기능 테스트 중! 실시간 모자이크 카메라 피드로 주행 영상 공유 중 🛴💨<br>
-                    <span class="fb-post-tags">#미래모빌리티 #애플디자인 #인터랙티브UI #라이드쉐어</span>
-                </div>
-
-                <!-- Reaction Count Bar -->
-                <div class="fb-reaction-bar">
-                    <span class="fb-reaction-count" id="like-count-display">
-                        Tae Eun and <span id="like-count-num">1,203</span> others like this
-                    </span>
-                    <span class="fb-comment-share-count">
-                        <span id="comment-count-num">88</span> comments · <span id="share-count-num">24</span> shares
-                    </span>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="fb-post-actions">
-                    <button class="fb-action-btn fb-like-btn active" id="btn-like-post">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
-                        </svg>
-                        Like
-                    </button>
-                    <button class="fb-action-btn" id="btn-comment-post">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
-                        </svg>
-                        Comment
-                    </button>
-                    <button class="fb-action-btn fb-share-btn" id="btn-share-post">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
-                        </svg>
-                        Share
-                    </button>
-                    <!-- Real-time Like Burst Container overlaying Like button -->
-                    <div id="heart-burst-container" class="heart-burst-container"></div>
-                </div>
-            </article>
-
-            <!-- ===== POST 2: AUTO-GENERATED COMPLETED RIDE CARD ===== -->
-            <!-- Hidden initially; JS auto-shows this when ride ends (speed drops to 0 after LIVE) -->
-            <article class="fb-post-card" id="completed-ride-card" style="display:none;">
-                <div class="fb-post-header">
-                    <div class="fb-post-meta" style="margin-left: 0;">
-                        <div class="fb-post-author-line">
-                            <span class="fb-post-action-text">completed a ride at
-                                <a href="#" class="fb-post-location-link" id="completed-location-name">Seoul</a>
-                            </span>
-                        </div>
-                        <div class="fb-post-timestamp" id="completed-timestamp">Just now · 🌍</div>
-                    </div>
-                    <div class="fb-completed-badge">COMPLETED</div>
-                </div>
-                <div class="fb-post-map-card">
-                    <div class="fb-map-graphic">
-                        <div class="fb-map-overlay-text">
-                            <h3 id="completed-route-name">Ride Complete</h3>
-                            <p id="completed-stats">🛣 0.0 km Completed &nbsp;·&nbsp; ⚡ Avg 0 km/h</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="fb-post-caption" id="completed-caption">
-                    라이딩 완료! 시스템이 자동으로 기록했습니다 🛴✨
-                </div>
-                <div class="fb-reaction-bar">
-                </div>
-                <div class="fb-post-actions">
-                    <button class="fb-action-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
-                        </svg> Like</button>
-                    <button class="fb-action-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
-                        </svg> Comment</button>
-                    <button class="fb-action-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                            <path
-                                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
-                        </svg> Share</button>
-                </div>
-            </article>
-
-        </main>
-
-        <!-- ===== RIGHT SIDEBAR ===== -->
-        <aside class="fb-right-sidebar">
-
-            <!-- Real-time Activity Ticker -->
-            <div class="fb-right-section">
-                <div class="fb-right-title">REAL-TIME ACTIVITY</div>
-                <div class="fb-ticker-item">
-                    <span class="fb-ticker-online-dot"></span>
-                    <span><b>Min Kyu</b> started a live ride</span>
-                </div>
-                <div class="fb-ticker-item">
-                    <span class="fb-ticker-online-dot"></span>
-                    <span><b>Seo Hyun</b> liked your post</span>
-                </div>
-                <div class="fb-ticker-item">
-                    <span class="fb-ticker-online-dot offline"></span>
-                    <span><b>Ji Woo</b> commented on a photo</span>
-                </div>
-                <div class="fb-ticker-item">
-                    <span class="fb-ticker-online-dot"></span>
-                    <span><b>Do Yoon</b> shared a ride</span>
-                </div>
-            </div>
-
-            <!-- People You May Know -->
-            <div class="fb-right-section">
-                <div class="fb-right-title">PEOPLE YOU MAY KNOW</div>
-                <div class="fb-pymk-item">
-                    <span class="fb-pymk-avatar" style="background: linear-gradient(135deg,#5ac8fa,#0071e3);">SH</span>
-                    <div class="fb-pymk-info">
-                        <div class="fb-pymk-name">Seo Hyun</div>
-                        <div class="fb-pymk-mutual">3 mutual friends</div>
-                    </div>
-                    <button class="fb-add-friend-btn" id="add-friend-seohyun">+ Add Friend</button>
-                </div>
-                <div class="fb-pymk-item">
-                    <span class="fb-pymk-avatar" style="background: linear-gradient(135deg,#ffcc00,#ff9500);">JW</span>
-                    <div class="fb-pymk-info">
-                        <div class="fb-pymk-name">Ji Woo</div>
-                        <div class="fb-pymk-mutual">5 mutual friends</div>
-                    </div>
-                    <button class="fb-add-friend-btn" id="add-friend-jiwoo">+ Add Friend</button>
-                </div>
-                <div class="fb-pymk-item">
-                    <span class="fb-pymk-avatar" style="background: linear-gradient(135deg,#34c759,#5ac8fa);">DY</span>
-                    <div class="fb-pymk-info">
-                        <div class="fb-pymk-name">Do Yoon</div>
-                        <div class="fb-pymk-mutual">1 mutual friend</div>
-                    </div>
-                    <button class="fb-add-friend-btn" id="add-friend-doyoon">+ Add Friend</button>
-                </div>
-            </div>
-
-            <!-- Chat -->
-            <div class="fb-right-section fb-chat-section">
-                <div class="fb-right-title">
-                    CHAT
-                    <span class="fb-chat-online-count">● 2 online</span>
-                </div>
-                <div class="fb-chat-item" id="chat-jisun">
-                    <span class="fb-chat-dot online"></span>
-                    <span class="fb-chat-name">Ji Sun</span>
-                </div>
-                <div class="fb-chat-item" id="chat-minkyu">
-                    <span class="fb-chat-dot online"></span>
-                    <span class="fb-chat-name">Min Kyu</span>
-                </div>
-                <div class="fb-chat-item offline" id="chat-doyoon">
-                    <span class="fb-chat-dot"></span>
-                    <span class="fb-chat-name">Do Yoon</span>
-                </div>
-                <div class="fb-chat-item offline" id="chat-jiwoo">
-                    <span class="fb-chat-dot"></span>
-                    <span class="fb-chat-name">Ji Woo</span>
-                </div>
-            </div>
-        </aside>
+            </a>
+        </nav>
     </div>
 
+    <!-- ===== TELEMETRY INFOGRAPHIC OVERLAY ===== -->
+    <div class="fb-like-infographic-overlay" id="like-infographic">
+        <div class="fb-infographic-card">
+            <button class="btn-infographic-close" id="btn-info-close">×</button>
+            <div class="info-thumb-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="info-thumb-svg">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                </svg>
+            </div>
+            <h3 class="info-title">주행 텔레메트리 리포트</h3>
+            <div class="info-stats-grid">
+                <div class="info-stat-box">
+                    <span class="info-stat-lbl">현재 속도</span>
+                    <span class="info-stat-val" id="info-val-speed">0.0 km/h</span>
+                </div>
+                <div class="info-stat-box">
+                    <span class="info-stat-lbl">조향 각도</span>
+                    <span class="info-stat-val" id="info-val-steer">0°</span>
+                </div>
+                <div class="info-stat-box">
+                    <span class="info-stat-lbl">주행 거리</span>
+                    <span class="info-stat-val" id="info-val-dist">0.00 km</span>
+                </div>
+                <div class="info-stat-box">
+                    <span class="info-stat-lbl">주행 시간</span>
+                    <span class="info-stat-val" id="info-val-duration">0s</span>
+                </div>
+            </div>
+            <div class="info-footer">
+                <span class="info-loc-tag" id="info-val-loc">📍 Seoul</span>
+            </div>
+        </div>
+    </div>
 
-
-    <!-- ===== MOBILE BOTTOM TAB BAR ===== -->
-    <nav class="fb-bottom-tabbar" id="fb-bottom-tabbar">
-        <a href="#" class="fb-bottom-tab active" id="tab-home">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-            Home
-        </a>
-        <a href="#" class="fb-bottom-tab" id="tab-friends">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-            </svg>
-            <span class="fb-bottom-tab-badge">4</span>
-            Friends
-        </a>
-        <a href="#" class="fb-bottom-tab" id="tab-messages">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-            </svg>
-            <span class="fb-bottom-tab-badge">2</span>
-            Messages
-        </a>
-        <a href="#" class="fb-bottom-tab" id="tab-notifications">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-            </svg>
-            <span class="fb-bottom-tab-badge">3</span>
-            Alerts
-        </a>
-        <a href="#" class="fb-bottom-tab" id="tab-profile">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-            </svg>
-            Profile
-        </a>
-    </nav>
-
-
-
+    <!-- Inject mini event connector for telemetry modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const likeCountDisplay = document.getElementById('like-count-display');
+            const likeInfographic = document.getElementById('like-infographic');
+            const btnInfoClose = document.getElementById('btn-info-close');
+            
+            likeCountDisplay?.addEventListener('click', () => {
+                likeInfographic?.classList.add('show');
+            });
+            btnInfoClose?.addEventListener('click', () => {
+                likeInfographic?.classList.remove('show');
+            });
+        });
+    </script>
     <script src="app.js"></script>
 </body>
 

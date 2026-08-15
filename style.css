@@ -1,48 +1,31 @@
 /* ==========================================================================
-   OLD FACEBOOK UI - 2009~2012 Style  (Mobile-First Edition)
-   Facebook Blue palette · Single-column · Bottom Tab Bar
+   INSTAGRAM MOBILE UI - Modern Interactive Edition
+   Instagram Palette · iOS Phone Shell · Circular Ishihara Canvas
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. CSS VARIABLES - Facebook Color System
+   1. CSS VARIABLES - Instagram Design System & Layout
    -------------------------------------------------------------------------- */
 :root {
-    --fb-blue: #3b5998;
-    --fb-blue-dark: #2d4373;
-    --fb-blue-light: #4267b2;
-    --fb-blue-hover: #3a5795;
-    --fb-blue-btn: #5b74a8;
+    /* Instagram Theme Colors */
+    --ig-bg: #fafafa;
+    --ig-card-bg: #ffffff;
+    --ig-border: #dbdbdb;
+    --ig-border-light: #efefef;
+    
+    --ig-text-primary: #262626;
+    --ig-text-secondary: #737373;
+    --ig-text-muted: #c7c7c7;
+    
+    --ig-blue: #0095f6;
+    --ig-red: #ff3040;
+    --ig-green: #00ca4e;
+    
+    --header-height: 54px;
+    --bottom-tab-height: 52px;
 
-    --fb-bg: #e9eaed;
-    --fb-card-bg: #ffffff;
-    --fb-card-border: #dddfe2;
-
-    --fb-text-primary: #1d2129;
-    --fb-text-secondary: #616770;
-    --fb-text-muted: #90949c;
-    --fb-link: #365899;
-    --fb-link-hover: #1d2129;
-
-    --fb-divider: #e5e5e5;
-    --fb-input-bg: #f5f6f7;
-    --fb-input-border: #ccd0d5;
-    --fb-btn-bg: #4a90d9;
-    --fb-btn-hover: #3b7dca;
-    --fb-action-border: #ced0d4;
-
-    --accent-orange: #ff9500;
-    --accent-pink: #ff2d55;
-    --accent-purple: #af52de;
-    --accent-cyan: #5ac8fa;
-    --accent-green: #34c759;
-    --accent-blue2: #0071e3;
-
-    --header-height: 50px;
-    --bottom-tab-height: 54px;
-
-    /* Exhibition canvas target size */
-    --canvas-w: 1080px;
-    --canvas-h: 1920px;
+    /* Base Font Family */
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* --------------------------------------------------------------------------
@@ -59,542 +42,398 @@ html,
 body {
     width: 100%;
     height: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    background-color: var(--fb-bg);
-    color: var(--fb-text-primary);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    line-height: 1.38;
+    background-color: #0f0f10; /* Dark premium backdrop for the simulator */
+    font-family: var(--font-family);
+    color: var(--ig-text-primary);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     -webkit-font-smoothing: antialiased;
 }
 
-/* ==========================================================================
-   EXHIBITION CANVAS WRAPPER
-   Fixed 1080×1920 (portrait FHD) — simulates a 1920×1080 monitor
-   physically rotated 90° for vertical display.
-   Everything inside renders at this exact size;
-   the browser scales the canvas to fit the screen.
-   ========================================================================== */
 a {
-    color: var(--fb-link);
+    color: var(--ig-text-primary);
     text-decoration: none;
 }
 
 a:hover {
-    color: var(--fb-link-hover);
-    text-decoration: underline;
+    text-decoration: none;
 }
 
-/* --------------------------------------------------------------------------
-   3. MOBILE HEADER
-   -------------------------------------------------------------------------- */
-.fb-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--header-height);
-    background: var(--fb-blue);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-    z-index: 200;
-}
-
-.fb-header-inner {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    gap: 8px;
-}
-
-.fb-logo {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 26px;
-    font-weight: bold;
-    color: #ffffff !important;
-    text-decoration: none !important;
-    letter-spacing: -1px;
-    line-height: 1;
-    flex-shrink: 0;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.fb-logo:hover {
-    color: #dfe3ee !important;
-    text-decoration: none !important;
-}
-
-display: flex;
-align-items: center;
-background: rgba(255, 255, 255, 0.2);
-border: 1px solid rgba(255, 255, 255, 0.25);
-border-radius: 20px;
-overflow: hidden;
-flex: 1;
-max-width: 220px;
-}
-
-.fb-search-input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #ffffff;
-    font-size: 13px;
-    padding: 6px 10px;
-    width: 100%;
-    font-family: Arial, sans-serif;
-}
-
-.fb-search-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-background: transparent;
-border: none;
-color: rgba(255, 255, 255, 0.8);
-padding: 6px 8px;
-cursor: pointer;
-display: flex;
-align-items: center;
-}
-
-.fb-header-nav {
-    display: none;
-}
-
-.fb-header-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.fb-user-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #ffffff !important;
-    font-size: 12px;
-    font-weight: bold;
-    text-decoration: none !important;
-    padding: 4px 10px;
-    border-radius: 20px;
-}
-
-.fb-find-friends-btn,
-.fb-status-time {
-    display: none;
-}
-
-/* --------------------------------------------------------------------------
-   4. PAGE LAYOUT - Mobile Single Column
-   -------------------------------------------------------------------------- */
-.fb-page-wrap {
-    margin-top: var(--header-height);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    height: calc(100vh - var(--header-height) - var(--bottom-tab-height));
-    overflow: hidden;
-    padding-bottom: 0;
-}
-
-/* --------------------------------------------------------------------------
-   5. LEFT SIDEBAR - hidden (single-column exhibition layout)
-   -------------------------------------------------------------------------- */
-.fb-left-sidebar {
-    display: none;
-}
-
-/* --------------------------------------------------------------------------
-   6. CENTER NEWS FEED - Fixed canvas width, no scroll
-   -------------------------------------------------------------------------- */
-.fb-center-feed {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 8px 0 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    height: 100%;
-    overflow: hidden;
-}
-
-/* --------------------------------------------------------------------------
-   7. STATUS UPDATE BOX
-   -------------------------------------------------------------------------- */
-.fb-status-box {
-    background: var(--fb-card-bg);
-    border-top: 1px solid var(--fb-card-border);
-    border-bottom: 1px solid var(--fb-card-border);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-.fb-status-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-}
-
-.fb-status-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--fb-card-border);
-    flex-shrink: 0;
-}
-
-.fb-status-avatar-fallback {
-    display: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--fb-blue);
-    color: #fff;
-    font-size: 15px;
-    font-weight: bold;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.fb-status-input {
-    flex: 1;
-    background: var(--fb-input-bg);
-    border: 1px solid var(--fb-input-border);
-    border-radius: 20px;
-    padding: 9px 16px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    color: var(--fb-text-secondary);
-    outline: none;
-    cursor: pointer;
-}
-
-.fb-status-footer {
-    display: flex;
-    align-items: center;
-    padding: 4px 8px 8px;
-    border-top: 1px solid var(--fb-divider);
-}
-
-.fb-status-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+button {
     background: none;
     border: none;
-    color: var(--fb-text-secondary);
-    font-size: 12px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    padding: 8px 6px;
-    border-radius: 6px;
     cursor: pointer;
-    flex: 1;
-    justify-content: center;
-    transition: background 0.15s;
-}
-
-.fb-status-action-btn:hover {
-    background: var(--fb-input-bg);
-}
-
-.fb-status-post-btn {
-    background: var(--fb-blue);
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
-    padding: 7px 18px;
-    font-size: 13px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-left: auto;
-}
-
-.fb-status-post-btn:hover {
-    background: var(--fb-blue-dark);
+    font-family: inherit;
+    outline: none;
 }
 
 /* --------------------------------------------------------------------------
-   8. SORT BAR
+   3. PHYSICAL MOBILE DEVICE MOCK SHELL (Desktop-first wrapper)
    -------------------------------------------------------------------------- */
-.fb-sort-bar {
+.instagram-mobile-shell {
+    position: relative;
+    width: 440px;
+    height: 900px;
+    background: var(--ig-card-bg);
+    border: 12px solid #1c1c1e; /* iPhone-like bezel */
+    border-radius: 46px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+/* Notch & Camera details */
+.phone-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 28px;
+    background: #1c1c1e;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    z-index: 500;
+}
+
+.phone-speaker {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 4px;
+    background: #3a3a3c;
+    border-radius: 2px;
+    z-index: 501;
+}
+
+.phone-camera {
+    position: absolute;
+    top: 5px;
+    left: calc(50% + 38px);
+    width: 6px;
+    height: 6px;
+    background: #0d1e3d;
+    border-radius: 50%;
+    z-index: 501;
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive details: fill screen on actual mobile devices */
+@media (max-width: 480px), (max-height: 900px) {
+    body {
+        background-color: var(--ig-card-bg);
+    }
+    .instagram-mobile-shell {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .phone-notch,
+    .phone-speaker,
+    .phone-camera {
+        display: none;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4. INSTAGRAM HEADER
+   -------------------------------------------------------------------------- */
+.instagram-header {
+    height: var(--header-height);
+    background: var(--ig-card-bg);
+    border-bottom: 1px solid var(--ig-border-light);
+    position: relative;
+    z-index: 200;
+    padding-top: 10px; /* Leave space for status bar/notch layout */
+}
+
+.instagram-header-inner {
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 14px;
-    background: var(--fb-card-bg);
-    border-top: 1px solid var(--fb-card-border);
-    border-bottom: 1px solid var(--fb-card-border);
+    padding: 0 16px;
 }
 
-.fb-sort-label {
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--fb-text-muted);
+.instagram-back-btn,
+.instagram-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ig-text-primary);
+    width: 32px;
+    height: 32px;
+}
+
+.instagram-back-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.instagram-menu-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.instagram-header-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.instagram-title-main {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ig-text-secondary);
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.fb-sort-options {
-    display: flex;
-    gap: 12px;
-}
-
-.fb-sort-link {
-    font-size: 12px;
-    color: var(--fb-text-muted);
-    text-decoration: none;
-}
-
-.fb-sort-link:hover {
-    color: var(--fb-link);
-    text-decoration: none;
-}
-
-.fb-sort-link.active {
-    color: var(--fb-blue);
-    font-weight: bold;
+.instagram-title-sub {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ig-text-primary);
+    margin-top: -1px;
 }
 
 /* --------------------------------------------------------------------------
-   9. POST CARDS
+   5. PAGE LAYOUT
    -------------------------------------------------------------------------- */
-.fb-post-card {
-    background: var(--fb-card-bg);
-    border-top: 1px solid var(--fb-card-border);
-    border-bottom: 1px solid var(--fb-card-border);
-    overflow: hidden;
-}
-
-.featured-post {
-    border-color: #c4d0e8;
-}
-
-.fb-post-header {
+.fb-page-wrap {
+    flex: 1;
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 14px 8px;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--ig-bg);
+}
+
+.fb-center-feed {
+    flex: 1;
+    overflow-y: scroll;
+    padding-bottom: 30px;
+    /* Hide scrollbar */
+    scrollbar-width: none; /* Firefox */
+}
+
+.fb-center-feed::-webkit-scrollbar {
+    display: none; /* Safari/Chrome */
+}
+
+/* --------------------------------------------------------------------------
+   6. INSTAGRAM POST CARD
+   -------------------------------------------------------------------------- */
+.instagram-post-card {
+    background: var(--ig-card-bg);
+    border-bottom: 1px solid var(--ig-border-light);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.instagram-post-card:not(:last-of-type) {
+    margin-bottom: 16px;
+}
+
+/* Post User Row (Header) */
+.instagram-post-user-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
     position: relative;
 }
 
-.fb-post-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--fb-card-border);
-    flex-shrink: 0;
+.instagram-user-avatar-wrap {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
 }
 
-.fb-post-avatar-fallback,
-.fb-post-avatar-text {
-    width: 44px;
-    height: 44px;
+.instagram-user-avatar-story-ring {
+    padding: 2px;
     border-radius: 50%;
-    color: #fff;
-    font-size: 15px;
-    font-weight: bold;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
 }
 
-.fb-post-meta {
+.instagram-user-avatar-inner {
+    width: 32px;
+    height: 32px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ig-card-bg);
+}
+
+.instagram-avatar-letter {
+    font-size: 13px;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.instagram-user-info {
     flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-.fb-post-author-line {
+.instagram-username-line {
+    display: flex;
+    flex-direction: column;
+}
+
+.instagram-post-author-name {
     font-size: 14px;
-    line-height: 1.4;
+    font-weight: 700;
+    color: var(--ig-text-primary);
 }
 
-.fb-post-author-name {
-    font-weight: bold;
-    color: var(--fb-text-primary);
-    text-decoration: none;
-}
-
-.fb-post-author-name:hover {
-    text-decoration: underline;
-    color: var(--fb-text-primary);
-}
-
-.fb-post-action-text {
-    color: var(--fb-text-primary);
-    font-weight: normal;
-    margin-left: 3px;
-}
-
-.fb-post-location-link {
-    font-weight: bold;
-}
-
-.fb-post-timestamp {
-    font-size: 12px;
-    color: var(--fb-text-muted);
-    margin-top: 2px;
-}
-
-.fb-globe-icon {
+.instagram-post-location-tag {
     font-size: 11px;
+    color: var(--ig-text-secondary);
+    margin-top: 1px;
+    display: inline-block;
+}
+
+.instagram-live-badge-wrap {
+    margin-right: 12px;
 }
 
 .fb-live-badge {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: #e02020;
+    background: var(--ig-red);
     color: #ffffff;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 3px 9px;
-    border-radius: 3px;
-    letter-spacing: 0.3px;
-    animation: badge-pulse 1.8s infinite;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    animation: live-pulse 1.5s infinite;
 }
 
-@keyframes badge-pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
-.fb-completed-badge {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: #6a737b;
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 3px 9px;
-    border-radius: 3px;
-    letter-spacing: 0.3px;
+.instagram-post-options-btn {
+    color: var(--ig-text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.options-dots-icon {
+    width: 18px;
+    height: 18px;
 }
 
 /* --------------------------------------------------------------------------
-   10. POST MEDIA - Camera + Mosaic Canvas (exhibition portrait canvas)
+   7. POST MEDIA - ISHIHARA CANVASES & HUD
    -------------------------------------------------------------------------- */
 .fb-post-media {
     position: relative;
     width: 100%;
-    /* Revert back to responsive fill for mobile UI layout */
-    flex: 1;
-    min-height: 0;
-    aspect-ratio: unset;
-    max-height: unset;
-    background: #0d0d1a;
+    aspect-ratio: 1 / 1; /* Pure square post media */
+    background: #000000;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .mosaic-canvas-layer {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
+    display: block;
     z-index: 1;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    background: #1c1c1e;
 }
 
 #riding-particles-canvas {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 2;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    z-index: 2;
 }
 
+/* HUD Overlay Styling */
 .hud-capsule {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 5;
-    background: rgba(59, 89, 152, 0.88);
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    padding: 8px 16px;
+    z-index: 5;
+    color: #ffffff;
 }
 
 .hud-item {
-    font-size: 11px;
     display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #ffffff;
+    flex-direction: column;
 }
 
 .hud-item .lbl {
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: bold;
-    font-size: 9px;
-    letter-spacing: 0.3px;
+    font-size: 8px;
+    font-weight: 800;
+    color: #8e8e93;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
 }
 
 .hud-item strong {
-    font-weight: bold;
-    color: #ffffff;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .hud-separator {
     width: 1px;
-    height: 14px;
-    background: rgba(255, 255, 255, 0.2);
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .status-indicator {
-    font-weight: bold;
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.6);
-    transition: all 0.3s;
+    font-size: 11px;
+    font-weight: 800;
+    color: #8e8e93;
+    display: flex;
+    align-items: center;
 }
 
 .status-indicator.active {
-    color: #34c759;
-    text-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
+    color: var(--ig-green);
+    text-shadow: 0 0 8px var(--ig-green);
 }
 
+/* Steer Edge Glows */
 .steer-glow-indicator {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 10px;
-    z-index: 5;
+    width: 25px;
+    z-index: 4;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s;
@@ -602,137 +441,77 @@ align-items: center;
 
 .left-glow {
     left: 0;
-    background: var(--accent-orange);
-    box-shadow: 24px 0 48px rgba(255, 149, 0, 0.35);
+    background: linear-gradient(90deg, rgba(0, 149, 246, 0.45) 0%, transparent 100%);
 }
 
 .right-glow {
     right: 0;
-    background: var(--accent-orange);
-    box-shadow: -24px 0 48px rgba(255, 149, 0, 0.35);
+    background: linear-gradient(-90deg, rgba(0, 149, 246, 0.45) 0%, transparent 100%);
 }
 
-.camera-permission-overlay {
+/* Foreground zone hint */
+.fg-zone-hint {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    top: 52%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 58%;
+    height: 58%;
+    border: 2px dashed rgba(240, 148, 51, 0.35);
+    border-radius: 50%;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
     transition: opacity 0.4s ease;
 }
 
-.camera-permission-box {
-    text-align: center;
-    color: #ffffff;
-    padding: 32px 28px;
-    border-radius: 16px;
-    background: rgba(28, 28, 30, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    width: 85%;
-    max-width: 300px;
+.fg-zone-hint.visible {
+    opacity: 1;
 }
 
-.camera-icon-wrap {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--fb-blue);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4px;
-}
-
-.camera-icon-wrap svg {
-    width: 30px;
-    height: 30px;
-    color: #ffffff;
-}
-
-.camera-permission-box h3 {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-}
-
-.camera-permission-box p {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.65);
-    line-height: 1.6;
-}
-
-.btn-request-camera {
-    margin-top: 6px;
-    background: var(--fb-blue);
-    color: #ffffff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    cursor: pointer;
-    transition: background 0.15s;
-    width: 100%;
-}
-
-.btn-request-camera:hover {
-    background: var(--fb-blue-dark);
-}
-
-/* Mosaic control badge - shown when camera active */
+/* Mosaic control badge slider */
 .mosaic-control-badge {
     position: absolute;
-    bottom: 14px;
-    right: 14px;
-    z-index: 8;
-    background: rgba(59, 89, 152, 0.88);
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
     padding: 8px 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity 0.4s ease;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 5;
+    color: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
 }
 
 .mosaic-label {
     font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 0.4px;
-    color: rgba(255, 255, 255, 0.7);
+    font-weight: 800;
+    color: #c7c7c7;
+    white-space: nowrap;
 }
 
 .mosaic-slider {
+    flex: 1;
     -webkit-appearance: none;
-    width: 90px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 10px;
+    background: #3a3a3c;
+    border-radius: 2px;
     outline: none;
 }
 
 .mosaic-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: #ffffff;
     cursor: pointer;
@@ -741,55 +520,267 @@ align-items: center;
 .mosaic-control-badge span:last-child {
     font-size: 11px;
     font-weight: bold;
-    color: #ffffff;
-    min-width: 30px;
+    min-width: 32px;
     text-align: right;
 }
 
-/* Speed-driven mosaic indicator */
-.mosaic-speed-indicator {
+/* Camera Permission Overlay */
+.camera-permission-overlay {
     position: absolute;
-    bottom: 14px;
-    left: 14px;
-    z-index: 8;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 6px 10px;
+    inset: 0;
+    background: rgba(20, 20, 22, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    color: #ffffff;
+    text-align: center;
+    padding: 24px;
+}
+
+.camera-permission-box {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
+    align-items: center;
 }
 
-.mosaic-speed-indicator.visible {
-    opacity: 1;
+.camera-icon-wrap {
+    width: 64px;
+    height: 64px;
+    color: #8e8e93;
+    margin-bottom: 16px;
+    background: #2c2c2e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.mosaic-speed-label {
-    font-size: 8px;
-    font-weight: bold;
-    letter-spacing: 0.4px;
-    color: rgba(255, 255, 255, 0.55);
+.camera-icon-wrap svg {
+    width: 32px;
+    height: 32px;
 }
 
-.mosaic-speed-value {
-    font-size: 12px;
-    font-weight: bold;
-    color: var(--accent-green);
+.camera-permission-box h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.camera-permission-box p {
+    font-size: 13px;
+    color: #8e8e93;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.btn-request-camera {
+    background: var(--ig-blue);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: opacity 0.2s;
+}
+
+.btn-request-camera:hover {
+    opacity: 0.9;
 }
 
 /* --------------------------------------------------------------------------
-   11. POST MAP CARD
+   8. CAROUSEL DOTS INDICATORS
    -------------------------------------------------------------------------- */
-.fb-post-map-card {
+.instagram-carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    margin-top: 12px;
+}
+
+.instagram-carousel-dots .dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--ig-text-muted);
+    border-radius: 50%;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.instagram-carousel-dots .dot.active {
+    background-color: var(--ig-blue);
+    transform: scale(1.2);
+}
+
+/* --------------------------------------------------------------------------
+   9. ACTION BUTTONS ROW
+   -------------------------------------------------------------------------- */
+.instagram-post-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 6px;
+    position: relative;
+}
+
+.left-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.instagram-action-btn {
+    color: var(--ig-text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    transition: transform 0.1s ease;
+}
+
+.instagram-action-btn:active {
+    transform: scale(0.9);
+}
+
+.action-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Like active state heart */
+.like-btn.active svg {
+    color: var(--ig-red) !important;
+    fill: var(--ig-red) !important;
+    animation: heart-beat 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes heart-beat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Repost count badge badge */
+.repost-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.repost-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ig-text-primary);
+}
+
+/* --------------------------------------------------------------------------
+   10. LIKES & CAPTION ROWS
+   -------------------------------------------------------------------------- */
+.instagram-likes-row {
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ig-text-primary);
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.instagram-caption-row {
+    padding: 0 14px 16px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.instagram-caption-content {
+    margin-bottom: 3px;
+}
+
+.caption-username {
+    font-weight: 700;
+    color: var(--ig-text-primary);
+    margin-right: 6px;
+}
+
+.caption-text {
+    color: var(--ig-text-primary);
+}
+
+.instagram-caption-sub {
+    color: var(--ig-text-secondary);
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.more-btn {
+    color: var(--ig-text-secondary);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Telemetry caption */
+.instagram-telemetry-caption {
+    font-size: 13px;
+    color: var(--ig-text-primary);
+    margin-top: 8px;
+    border-left: 2px solid var(--ig-border);
+    padding-left: 8px;
+}
+
+.instagram-post-tags {
+    color: #00376b; /* Instagram hashtag color */
+    font-weight: 500;
+    margin-top: 4px;
+    display: block;
+}
+
+.instagram-comments-teaser {
+    color: var(--ig-text-secondary);
+    font-size: 13px;
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+.instagram-post-date {
+    color: var(--ig-text-secondary);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    margin-top: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   11. COMPLETED POST STYLE
+   -------------------------------------------------------------------------- */
+.instagram-post-card.completed-post {
+    border-top: 1px solid var(--ig-border-light);
+    margin-top: 12px;
+}
+
+.instagram-post-location-tag-completed {
+    font-size: 11px;
+    color: var(--ig-text-secondary);
+    margin-top: 2px;
+}
+
+.instagram-completed-badge-wrap {
+    margin-right: 8px;
+}
+
+.instagram-completed-badge {
+    background: var(--ig-green);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.instagram-post-map-container {
     width: 100%;
-    height: 200px;
-    background: linear-gradient(135deg, #4a90d9 0%, #3b5998 100%);
+    height: 280px;
+    background: linear-gradient(135deg, #1d2b49 0%, #0095f6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -797,364 +788,58 @@ align-items: center;
     overflow: hidden;
 }
 
-.fb-post-map-card::before {
+.instagram-post-map-container::before {
     content: '';
     position: absolute;
     inset: 0;
     background-image:
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 30px),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 30px);
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 20px);
 }
 
 .fb-map-graphic {
-    text-align: center;
-    color: #ffffff;
     z-index: 1;
-    position: relative;
+    color: #ffffff;
+    text-align: center;
 }
 
 .fb-map-overlay-text h3 {
-    font-size: 22px;
-    font-weight: bold;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .fb-map-overlay-text p {
-    font-size: 13px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 4px 12px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-/* --------------------------------------------------------------------------
-   12. POST CAPTION
-   -------------------------------------------------------------------------- */
-.fb-post-caption {
-    padding: 10px 14px;
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--fb-text-primary);
-}
-
-.fb-post-tags {
-    color: var(--fb-blue);
-    font-size: 13px;
-}
-
-/* --------------------------------------------------------------------------
-   13. REACTION BAR
-   -------------------------------------------------------------------------- */
-.fb-reaction-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 20px;
-    border-top: 1px solid var(--fb-divider);
-    border-bottom: 1px solid var(--fb-divider);
-    font-size: 18px;
-    color: var(--fb-text-primary);
-    font-weight: bold;
-}
-
-.fb-reaction-count {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.fb-like-thumb {
-    font-size: 18px;
-}
-
-.fb-comment-share-count {
-    color: var(--fb-text-secondary);
-    font-size: 14px;
-}
-
-/* --------------------------------------------------------------------------
-   14. ACTION BUTTONS
-   -------------------------------------------------------------------------- */
-.fb-post-actions {
-    display: flex;
-    align-items: center;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--fb-divider);
-    gap: 8px;
-}
-
-.fb-action-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    color: var(--fb-text-secondary);
-    font-size: 14px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    padding: 12px 4px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
     border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-}
-
-.fb-action-btn:hover {
-    background: var(--fb-input-bg);
-    color: var(--fb-text-primary);
-}
-
-.fb-action-btn.fb-like-btn {
-    flex: 1.8;
-    background: #e7f3ff;
-    color: #1877f2;
-    font-size: 18px;
-    border-radius: 8px;
-    padding: 14px 8px;
-}
-
-.fb-action-btn.fb-like-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-.fb-action-btn.fb-like-btn:hover {
-    background: #dbeeff;
-}
-
-.fb-action-btn.fb-like-btn.active {
-    background: #1877f2;
-    color: #ffffff;
-}
-
-.fb-post-actions .fb-action-btn + .fb-action-btn {
-    border-left: none;
+    display: inline-block;
+    backdrop-filter: blur(5px);
 }
 
 /* --------------------------------------------------------------------------
-   15. COMMENTS SECTION
-   -------------------------------------------------------------------------- */
-.fb-comments-section {
-    padding: 10px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: #f7f8fa;
-}
-
-.fb-write-comment {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.fb-comment-avatar-sm {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--fb-card-border);
-    flex-shrink: 0;
-}
-
-.fb-comment-input {
-    flex: 1;
-    background: #ffffff;
-    border: 1px solid var(--fb-input-border);
-    border-radius: 20px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-family: Arial, sans-serif;
-    outline: none;
-    color: var(--fb-text-secondary);
-    transition: border-color 0.15s;
-}
-
-.fb-comment-input:focus {
-    border-color: var(--fb-blue);
-}
-
-.fb-comment {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.fb-comment-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--fb-card-border);
-    flex-shrink: 0;
-}
-
-.fb-comment-avatar-text {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.fb-comment-bubble {
-    background: #ffffff;
-    border: 1px solid var(--fb-card-border);
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--fb-text-primary);
-    flex: 1;
-}
-
-.fb-comment-author {
-    font-weight: bold;
-    color: var(--fb-text-primary);
-    display: block;
-    margin-bottom: 2px;
-    font-size: 13px;
-    text-decoration: none;
-}
-
-.fb-comment-author:hover {
-    text-decoration: underline;
-    color: var(--fb-text-primary);
-}
-
-.fb-comment-actions {
-    margin-top: 5px;
-    font-size: 12px;
-    color: var(--fb-text-muted);
-}
-
-.fb-comment-actions a {
-    color: var(--fb-text-secondary);
-    font-weight: bold;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-.fb-comment-actions a:hover {
-    text-decoration: underline;
-}
-
-/* --------------------------------------------------------------------------
-   16. RIGHT SIDEBAR - hidden on mobile
-   -------------------------------------------------------------------------- */
-.fb-right-sidebar {
-    display: none;
-}
-
-/* --------------------------------------------------------------------------
-   17. BOTTOM TAB BAR - Fixed at bottom of exhibition canvas
-   -------------------------------------------------------------------------- */
-.fb-bottom-tabbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-tab-height);
-    background: var(--fb-blue);
-    display: flex;
-    align-items: stretch;
-    z-index: 300;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
-}
-
-.fb-bottom-tab {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none !important;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 6px 4px;
-    transition: background 0.15s;
-    position: relative;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: Arial, sans-serif;
-}
-
-.fb-bottom-tab:hover {
-    background: rgba(0, 0, 0, 0.12);
-    color: #ffffff;
-}
-
-.fb-bottom-tab.active {
-    color: #ffffff;
-    background: rgba(0, 0, 0, 0.18);
-}
-
-.fb-bottom-tab.active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 3px;
-    background: #ffffff;
-    border-radius: 0 0 3px 3px;
-}
-
-.fb-bottom-tab svg {
-    width: 24px;
-    height: 24px;
-}
-
-.fb-bottom-tab-badge {
-    position: absolute;
-    top: 6px;
-    right: calc(50% - 18px);
-    background: #e02020;
-    color: #ffffff;
-    font-size: 9px;
-    font-weight: bold;
-    min-width: 14px;
-    height: 14px;
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 3px;
-}
-
-/* --------------------------------------------------------------------------
-   18. DYNAMIC ISLAND (Mobility Controller) - positioned inside exhibition canvas
+   12. DYNAMIC ISLAND (Simulator Controller)
    -------------------------------------------------------------------------- */
 .dynamic-island-wrapper {
     position: absolute;
-    bottom: calc(var(--bottom-tab-height) + 14px);
+    bottom: calc(var(--bottom-tab-height) + 16px);
     left: 50%;
     transform: translateX(-50%);
     background: #000000;
     color: #ffffff;
     z-index: 1000;
     overflow: hidden;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-    transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .dynamic-island-wrapper.minimized {
-    width: 500px;
-    height: 42px;
-    border-radius: 30px;
-    padding: 0 16px;
+    width: 320px;
+    height: 38px;
+    border-radius: 19px;
+    padding: 0 14px;
     cursor: pointer;
 }
 
@@ -1167,68 +852,53 @@ align-items: center;
 }
 
 .island-pulse-dot {
-    width: 7px;
-    height: 7px;
-    background: #34c759;
+    width: 6px;
+    height: 6px;
+    background: var(--ig-green);
     border-radius: 50%;
-    box-shadow: 0 0 8px #34c759;
-    animation: island-ping 1.8s infinite;
+    box-shadow: 0 0 6px var(--ig-green);
+    animation: island-ping 1.6s infinite;
     flex-shrink: 0;
 }
 
 @keyframes island-ping {
-    0% {
-        transform: scale(0.9);
-        opacity: 0.6;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(0.9);
-        opacity: 0.6;
-    }
+    0%, 100% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
 }
 
 .island-min-text {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.2px;
-    color: #b2b2b7;
-    font-family: Arial, sans-serif;
+    color: #a2a2a7;
 }
 
 .island-min-stats {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-family: Arial, sans-serif;
+    gap: 4px;
 }
 
 .island-divider {
-    color: #3a3a3c;
-    font-size: 10px;
+    color: #2c2c2e;
+    font-size: 9px;
 }
 
 .island-chevron {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     color: #8e8e93;
-    transition: transform 0.3s;
     flex-shrink: 0;
 }
 
 .dynamic-island-wrapper.expanded {
-    width: min(400px, 94vw);
-    height: 290px;
-    border-radius: 28px;
-    padding: 20px;
+    width: 380px;
+    height: 280px;
+    border-radius: 24px;
+    padding: 16px;
 }
 
 .island-expanded-panel {
@@ -1236,7 +906,7 @@ align-items: center;
     flex-direction: column;
     height: 100%;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
 }
 
 .dynamic-island-wrapper.expanded .island-expanded-panel {
@@ -1252,23 +922,22 @@ align-items: center;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #1c1c1e;
-    padding-bottom: 12px;
-    margin-bottom: 14px;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .island-header h3 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #ffffff;
-    font-family: Arial, sans-serif;
 }
 
 .btn-island-close {
     background: #1c1c1e;
     border: none;
     color: #fff;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -1277,14 +946,14 @@ align-items: center;
 }
 
 .btn-island-close svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
 }
 
 .island-body {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
 }
 
 .island-row {
@@ -1294,42 +963,39 @@ align-items: center;
 }
 
 .island-row .label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: #8e8e93;
-    font-family: Arial, sans-serif;
 }
 
 .btn-toggle-engine {
     background: #1c1c1e;
     color: #ffffff;
     border: 1px solid #2c2c2e;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    padding: 6px 18px;
-    border-radius: 14px;
+    padding: 4px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    font-family: Arial, sans-serif;
-    transition: all 0.25s;
+    transition: all 0.2s;
 }
 
 .btn-toggle-engine.active {
-    background: #34c759;
-    border-color: #34c759;
+    background: var(--ig-green);
+    border-color: var(--ig-green);
     color: #ffffff;
 }
 
 .island-slider-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .island-slider-item .slider-info {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
-    font-family: Arial, sans-serif;
+    font-size: 11px;
 }
 
 .island-slider-item .slider-info span {
@@ -1343,7 +1009,7 @@ align-items: center;
 .apple-range-slider {
     -webkit-appearance: none;
     width: 100%;
-    height: 5px;
+    height: 4px;
     background: #2c2c2e;
     border-radius: 10px;
     outline: none;
@@ -1352,8 +1018,8 @@ align-items: center;
 .apple-range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #ffffff;
     cursor: pointer;
@@ -1362,20 +1028,19 @@ align-items: center;
 .island-presets-group {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 6px;
+    margin-top: 2px;
 }
 
 .btn-island-preset {
     background: #1c1c1e;
     border: none;
     color: #fff;
-    padding: 8px 4px;
-    border-radius: 10px;
-    font-size: 11px;
+    padding: 6px 2px;
+    border-radius: 8px;
+    font-size: 10px;
     font-weight: 700;
     cursor: pointer;
-    font-family: Arial, sans-serif;
     transition: background 0.2s;
 }
 
@@ -1384,300 +1049,65 @@ align-items: center;
 }
 
 /* --------------------------------------------------------------------------
-   19. SHADOW UTILITY
+   13. INSTAGRAM BOTTOM TAB BAR
    -------------------------------------------------------------------------- */
-.shadow-sm {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* Ride status badge */
-.ride-status-badge {
+.instagram-bottom-tabbar {
     position: absolute;
-    top: 12px;
-    right: 14px;
-    background: #e02020;
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 3px 9px;
-    border-radius: 3px;
-    letter-spacing: 0.3px;
-    animation: badge-pulse 1.8s infinite;
-}
-
-.ride-status-badge.stationary {
-    background: #6a737b;
-    animation: none;
-}
-
-/* ==========================================================================
-   20. ISHIHARA MOSAIC UPGRADE - Dual-Zone Pixelation System
-   ========================================================================== */
-
-/* Dark gap background for tile spacing effect */
-.mosaic-canvas-layer {
-    background: #0d0d1a !important;
-}
-
-/* Ishihara zone legend badge */
-.ishihara-legend {
-    position: absolute;
-    bottom: 52px;
-    left: 14px;
-    z-index: 8;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.ishihara-legend.visible {
-    opacity: 1;
-}
-
-.ishihara-legend-item {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-tab-height);
+    background: var(--ig-card-bg);
+    border-top: 1px solid var(--ig-border-light);
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(0, 0, 0, 0.70);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 6px;
-    padding: 5px 9px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    justify-content: space-around;
+    z-index: 300;
+    padding-bottom: 4px;
 }
 
-.ishihara-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
+.instagram-bottom-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ig-text-primary);
+    flex: 1;
+    height: 100%;
 }
 
-.ishihara-dot.fg {
-    background: linear-gradient(135deg, #dc2626, #ea580c, #f59e0b);
-    border-radius: 2px;
+.nav-icon {
+    width: 24px;
+    height: 24px;
 }
 
-.ishihara-dot.bg {
-    background: linear-gradient(135deg, #1d4ed8, #6d28d9);
-    border-radius: 2px;
+.instagram-bottom-tab.active {
+    color: #000000;
 }
 
-.ishihara-legend-text {
-    font-size: 9px;
+.instagram-nav-profile-avatar {
+    width: 24px;
+    height: 24px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
     font-weight: bold;
-    letter-spacing: 0.3px;
-    color: rgba(255, 255, 255, 0.8);
-    white-space: nowrap;
+    border: 1px solid var(--ig-text-primary);
 }
 
 /* --------------------------------------------------------------------------
-   Control panel labels — low-saturation / dimmed
-   so the eye stays focused on the Ishihara mosaic image
+   14. TELEMETRY INFOGRAPHIC OVERLAY (Modal Popup)
    -------------------------------------------------------------------------- */
-.mosaic-label {
-    font-size: 9px !important;
-    font-weight: bold;
-    letter-spacing: 0.4px;
-    color: rgba(255, 255, 255, 0.35) !important;
-}
-
-.mosaic-speed-value {
-    font-size: 12px !important;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.45) !important;
-    text-shadow: none !important;
-}
-
-/* Control badge border: subtle warm shimmer (low opacity) */
-@keyframes ishihara-shimmer {
-
-    0%,
-    100% {
-        border-color: rgba(220, 38, 38, 0.12);
-    }
-
-    25% {
-        border-color: rgba(22, 163, 74, 0.10);
-    }
-
-    50% {
-        border-color: rgba(37, 99, 235, 0.10);
-    }
-
-    75% {
-        border-color: rgba(234, 179, 8, 0.12);
-    }
-}
-
-.mosaic-control-badge {
-    animation: ishihara-shimmer 3s infinite;
-}
-
-/* Foreground zone overlay hint - subtle ellipse to show person zone */
-.fg-zone-hint {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -45%);
-    width: 60%;
-    height: 70%;
-    border: 2px dashed rgba(249, 115, 22, 0.35);
-    border-radius: 50%;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.fg-zone-hint.visible {
-    opacity: 1;
-}
-
-/* ==========================================================================
-   21. EXHIBITION CANVAS LAYOUT RULES
-   Global (no media query needed — canvas is always fixed 1080×1920)
-   ========================================================================== */
-
-/* Status box and sort bar: hide to maximize camera view */
-.fb-status-box,
-.fb-sort-bar {
-    display: none;
-}
-
-/* Featured post (camera post): flex fill the page wrap height */
-.fb-post-card.featured-post {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Hide second post (Ji Sun's map post) — canvas is camera-only */
-.fb-post-card:not(.featured-post) {
-    display: none;
-}
-
-/* Reaction bar: compact for exhibition */
-.fb-reaction-bar {
-    padding: 6px 20px;
-    font-size: 13px;
-}
-
-.fb-post-actions {
-    padding: 0 10px 4px;
-}
-
-/* Comments: show max 1 comment for visual clarity */
-.fb-comments-section .fb-comment:nth-child(n+3) {
-    display: none;
-}
-
-/* Post header padding: give some room on wide canvas */
-.fb-post-header {
-    padding: 14px 20px 10px;
-}
-
-/* Caption: slightly larger text for vertical monitor readability */
-.fb-post-caption {
-    padding: 8px 20px 6px;
-    font-size: 15px;
-}
-
-/* ==========================================================================
-   22. EXHIBITION CANVAS — DYNAMIC ISLAND CONTROLLER POSITION
-   ========================================================================== */
-/* Dynamic island is absolutely positioned inside the canvas */
-.dynamic-island-wrapper {
-    position: absolute;
-}
-
-/* ==========================================================================
-   23. LIVE LOCATION TAG (speed/GPS driven)
-   ========================================================================== */
-.fb-post-location-tag {
-    display: inline-block;
-    margin-left: 6px;
-    background: rgba(59, 89, 152, 0.12);
-    color: var(--fb-link);
-    border: 1px solid rgba(59, 89, 152, 0.25);
-    border-radius: 10px;
-    padding: 1px 8px;
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 0.2px;
-    transition: opacity 0.4s ease;
-    vertical-align: middle;
-}
-
-/* ==========================================================================
-   24. REACTION COUNT ANIMATION (ride duration driven)
-   ========================================================================== */
-#like-count-num,
-#comment-count-num,
-#share-count-num {
-    display: inline-block;
-    transition: transform 0.15s ease, color 0.3s ease;
-    font-weight: bold;
-}
-
-/* Momentary pop when count increments (applied via JS classList) */
-@keyframes count-pop {
-    0% {
-        transform: scale(1);
-    }
-
-    40% {
-        transform: scale(1.25);
-        color: #e02020;
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.count-popping {
-    animation: count-pop 0.25s ease forwards;
-}
-
-/* ==========================================================================
-   25. COMPLETED RIDE CARD — auto-generated, slide-in reveal
-   ========================================================================== */
-#completed-ride-card {
-    /* Default flex-column set by JS; starts hidden */
-    border-left: 3px solid var(--accent-green);
-    position: relative;
-}
-
-#completed-ride-card::before {
-    content: '🤖 시스템 자동 게시';
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--accent-green);
-    color: #fff;
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 0.3px;
-    padding: 2px 10px;
-}
-
-/* ==========================================================================
-   26. LIKE BUTTON INFOGRAPHIC OVERLAY
-   ========================================================================== */
 .fb-like-infographic-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
@@ -1695,17 +1125,16 @@ align-items: center;
 }
 
 .fb-infographic-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 420px;
-    padding: 30px 24px;
+    background: var(--ig-card-bg);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+    width: 88%;
+    max-width: 360px;
+    padding: 24px;
     text-align: center;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     transform: scale(0.85) translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
 
 .fb-like-infographic-overlay.show .fb-infographic-card {
@@ -1714,107 +1143,97 @@ align-items: center;
 
 .btn-infographic-close {
     position: absolute;
-    top: 14px;
-    right: 18px;
-    font-size: 28px;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
     background: none;
     border: none;
-    color: #8e8e93;
+    color: var(--ig-text-secondary);
     cursor: pointer;
-    font-weight: 300;
-}
-
-.btn-infographic-close:hover {
-    color: #1c1c1e;
 }
 
 .info-thumb-wrap {
-    width: 72px;
-    height: 72px;
-    background: #1877f2;
+    width: 56px;
+    height: 56px;
+    background: var(--ig-red);
     color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
-    box-shadow: 0 8px 24px rgba(24, 119, 242, 0.45);
+    margin: 0 auto 12px;
+    box-shadow: 0 6px 16px rgba(255, 48, 64, 0.35);
     animation: thumb-bounce 2s infinite ease-in-out;
 }
 
 @keyframes thumb-bounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-6px) scale(1.05); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 .info-thumb-svg {
-    width: 36px;
-    height: 36px;
+    width: 26px;
+    height: 26px;
 }
 
 .info-title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 800;
-    color: #050505;
-    margin-bottom: 24px;
-    letter-spacing: -0.5px;
+    color: var(--ig-text-primary);
+    margin-bottom: 18px;
 }
 
 .info-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 18px;
 }
 
 .info-stat-box {
-    background: #f0f2f5;
+    background: var(--ig-bg);
     border-radius: 12px;
-    padding: 14px;
+    padding: 12px;
     text-align: left;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--ig-border-light);
 }
 
 .info-stat-lbl {
     display: block;
     font-size: 9px;
-    font-weight: bold;
-    color: #65676b;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
+    font-weight: 800;
+    color: var(--ig-text-secondary);
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 .info-stat-val {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
-    color: #1877f2;
+    color: var(--ig-blue);
 }
 
 .info-footer {
-    border-top: 1px solid #e4e6eb;
-    padding-top: 14px;
+    border-top: 1px solid var(--ig-border-light);
+    padding-top: 12px;
 }
 
 .info-loc-tag {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    color: #65676b;
+    color: var(--ig-text-secondary);
 }
 
-/* ==========================================================================
-   23. HEART BURST ANIMATION
-   ========================================================================== */
-.fb-post-actions {
-    position: relative !important;
-}
-
+/* --------------------------------------------------------------------------
+   15. FLOATING HEART BURST ANIMATION
+   -------------------------------------------------------------------------- */
 .heart-burst-container {
     position: absolute;
-    bottom: 30px;
-    left: 16.7%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 50px;
+    bottom: 36px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
     pointer-events: none;
     z-index: 100;
     overflow: visible;
@@ -1822,13 +1241,13 @@ align-items: center;
 
 .floating-heart {
     position: absolute;
-    bottom: -40px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: floatUp 3s ease-out forwards;
+    animation: floatUp 2.5s ease-out forwards;
     opacity: 0;
     will-change: transform, opacity;
 }
@@ -1840,13 +1259,13 @@ align-items: center;
     }
     15% {
         opacity: 0.9;
-        transform: translate(var(--sway-1), -50px) scale(var(--scale-1, 1.1)) rotate(var(--rot-1));
+        transform: translate(var(--sway-1), -40px) scale(var(--scale-1, 1.1)) rotate(var(--rot-1));
     }
     50% {
-        transform: translate(var(--sway-2), -150px) scale(calc(var(--scale-1, 1.1) * 0.85)) rotate(var(--rot-2));
+        transform: translate(var(--sway-2), -120px) scale(calc(var(--scale-1, 1.1) * 0.8)) rotate(var(--rot-2));
     }
     100% {
-        transform: translate(var(--sway-3), -320px) scale(calc(var(--scale-1, 1.1) * 0.7)) rotate(var(--rot-3));
+        transform: translate(var(--sway-3), -260px) scale(calc(var(--scale-1, 1.1) * 0.6)) rotate(var(--rot-3));
         opacity: 0;
     }
 }

@@ -420,19 +420,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const FG_PALETTE = buildFgPalette();
         const gap = 1;
 
-        // BG pass — cold-toned small pixels
+        // Hash function for coordinate-stable random variations (Ishihara dots feel)
+        function hashCoords(x, y) {
+            const val = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+            return val - Math.floor(val);
+        }
+
+        // BG pass — cold-toned small circles
         for (let y = 0; y < H; y += bgPixSize) {
             for (let x = 0; x < W; x += bgPixSize) {
                 const fg = getForegroundness(x + bgPixSize/2, y + bgPixSize/2, W, H);
                 if (fg > 0.5) continue;
                 const [r, g, b] = sampleRect(x, y, bgPixSize, bgPixSize);
                 const [qr, qg, qb] = quantize(r, g, b, BG_PALETTE);
+                
+                const stableRand = hashCoords(x, y);
+                const sizeRatio = 0.4 + stableRand * 0.6; // size ratio between 40% and 100%
+                const radius = Math.max(1, ((bgPixSize - gap * 2) / 2) * sizeRatio);
+
                 mosaicCtx.fillStyle = `rgb(${qr},${qg},${qb})`;
-                mosaicCtx.fillRect(x+gap, y+gap, bgPixSize-gap*2, bgPixSize-gap*2);
+                mosaicCtx.beginPath();
+                mosaicCtx.arc(x + bgPixSize/2, y + bgPixSize/2, radius, 0, Math.PI * 2);
+                mosaicCtx.fill();
             }
         }
 
-        // FG pass — speed-coded thermal pixels mapped from luminance
+        // FG pass — speed-coded thermal circles mapped from luminance
         for (let y = 0; y < H; y += fgPixSize) {
             for (let x = 0; x < W; x += fgPixSize) {
                 const fg = getForegroundness(x + fgPixSize/2, y + fgPixSize/2, W, H);
@@ -446,8 +459,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 mosaicCtx.globalAlpha = Math.min(1, fg * 1.5);
                 const bm = 0.6 + lum * 0.7;
+                
+                const stableRand = hashCoords(x, y);
+                const sizeRatio = 0.4 + stableRand * 0.6; // size ratio between 40% and 100%
+                const radius = Math.max(1, ((fgPixSize - gap * 2) / 2) * sizeRatio);
+
                 mosaicCtx.fillStyle = `rgb(${Math.min(255,Math.round(qr*bm))},${Math.min(255,Math.round(qg*bm))},${Math.min(255,Math.round(qb*bm))})`;
-                mosaicCtx.fillRect(x+gap, y+gap, fgPixSize-gap*2, fgPixSize-gap*2);
+                mosaicCtx.beginPath();
+                mosaicCtx.arc(x + fgPixSize/2, y + fgPixSize/2, radius, 0, Math.PI * 2);
+                mosaicCtx.fill();
                 mosaicCtx.globalAlpha = 1;
             }
         }
@@ -457,12 +477,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function startCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
-                audio: false
-            });
+            let stream = null;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                const legacyGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+                if (!legacyGetUserMedia) {
+                    throw new Error("MEDIA_DEVICES_UNSUPPORTED");
+                }
+                stream = await new Promise((resolve, reject) => {
+                    legacyGetUserMedia.call(navigator, { video: true, audio: false }, resolve, reject);
+                });
+            } else {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                        audio: false
+                    });
+                } catch (resErr) {
+                    console.warn('High-res camera failed, fallback to basic video:', resErr);
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: false
+                    });
+                }
+            }
+
             cameraVideo.srcObject = stream;
-            await cameraVideo.play();
+            await cameraVideo.play().catch(e => console.warn('Camera play warning:', e));
             cameraActive = true;
 
             if (cameraPermOverlay) {
@@ -488,10 +528,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderMosaicFrame();
         } catch (err) {
-            console.warn('Camera denied:', err);
+            console.warn('Camera denied or unavailable:', err);
             if (cameraPermOverlay) {
                 const p = cameraPermOverlay.querySelector('.camera-permission-box p');
-                if (p) p.textContent = '카메라 접근이 거부되었습니다. 브라우저 설정에서 허용해 주세요.';
+                if (p) {
+                    if (window.location.protocol === 'file:') {
+                        p.innerHTML = '로컬 파일(file://)에서는 카메라가 차단됩니다.<br><code>node server.js</code> 실행 후 <a href="http://localhost:3000/산학%207번%20SNS/index.html" style="color:#0095f6;">http://localhost:3000</a> 으로 접속해주세요.';
+                    } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                        p.textContent = '카메라 접근이 거부되었습니다. 크롬 주소창 좌측 🔒 아이콘에서 카메라를 허용해 주세요.';
+                    } else if (err.name === 'NotFoundError') {
+                        p.textContent = '사용 가능한 카메라 장치를 찾을 수 없습니다.';
+                    } else if (err.name === 'NotReadableError') {
+                        p.textContent = '다른 프로그램에서 카메라를 사용 중입니다. 카메라 사용을 종료하고 다시 시도하세요.';
+                    } else {
+                        p.textContent = `카메라를 시작할 수 없습니다: ${err.message || err.name}`;
+                    }
+                }
             }
         }
     }
@@ -586,25 +638,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const heart = document.createElement('div');
         heart.className = 'floating-heart';
 
-        // Create programmatic circular Facebook Like badge SVG
+        // Create Instagram red/pink heart SVG
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 36 36');
+        svg.setAttribute('viewBox', '0 0 24 24');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
 
-        // Draw blue circular background
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', '18');
-        circle.setAttribute('cy', '18');
-        circle.setAttribute('r', '18');
-        circle.setAttribute('fill', '#1877f2');
-        svg.appendChild(circle);
-
-        // Draw white thumbs up path (scaled and centered inside)
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z');
-        path.setAttribute('fill', '#ffffff');
-        path.setAttribute('transform', 'translate(9, 9) scale(0.75)');
+        path.setAttribute('d', 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+        path.setAttribute('fill', '#ff3040');
         svg.appendChild(path);
 
         heart.appendChild(svg);
