@@ -12,9 +12,6 @@
 <body>
     <!-- ===== PHYSICAL MOBILE DEVICE MOCK SHELL ===== -->
     <div class="instagram-mobile-shell">
-        <div class="phone-notch"></div>
-        <div class="phone-speaker"></div>
-        <div class="phone-camera"></div>
 
         <!-- ===== INSTAGRAM HEADER ===== -->
         <header class="instagram-header" id="main-navbar">
@@ -190,21 +187,27 @@
                             융복합 미디어아트 전시 【Undefined... <span class="more-btn">더 보기</span>
                         </div>
                         
-                        <!-- Telemetry Caption -->
+                        <!-- Telemetry Caption (Hidden as requested) -->
+                        <!--
                         <div class="instagram-telemetry-caption">
                             드디어 신형 모빌리티 라이딩 기능 테스트 중! 실시간 모자이크 카메라 피드로 주행 영상 공유 중 🛴💨<br>
                             <span class="instagram-post-tags">#미래모빌리티 #애플디자인 #인터랙티브UI #라이드쉐어</span>
                         </div>
+                        -->
 
-                        <!-- Comments section link -->
+                        <!-- Comments section link (Hidden as requested) -->
+                        <!--
                         <div class="instagram-comments-teaser">
                             댓글 <span id="comment-count-num">88</span>개 모두 보기
                         </div>
+                        -->
 
-                        <!-- Post Date -->
+                        <!-- Post Date (Hidden as requested) -->
+                        <!--
                         <div class="instagram-post-date">
                             8월 4일
                         </div>
+                        -->
                     </div>
                 </article>
 
@@ -266,63 +269,6 @@
             <aside class="fb-right-sidebar" style="display: none;"></aside>
         </div>
 
-        <!-- ===== DYNAMIC ISLAND CONTROLLER ===== -->
-        <div class="dynamic-island-wrapper minimized" id="sim-island">
-            <!-- Minimized State Bar -->
-            <div class="island-min-bar" id="island-trigger">
-                <span class="island-pulse-dot"></span>
-                <span class="island-min-text">MOBILITY CONTROLLER</span>
-                <div class="island-min-stats">
-                    <span id="island-stat-speed">0.0 km/h</span>
-                    <span class="island-divider">|</span>
-                    <span id="island-stat-rot">0°</span>
-                </div>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="island-chevron">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </div>
-
-            <!-- Expanded Control Panel -->
-            <div class="island-expanded-panel">
-                <div class="island-header">
-                    <h3>Mobility Simulator</h3>
-                    <button class="btn-island-close" id="btn-island-minimize">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="island-body">
-                    <div class="island-row">
-                        <span class="label">ENGINE STATE</span>
-                        <button class="btn-toggle-engine active" id="sim-btn-power">STOP</button>
-                    </div>
-                    
-                    <div class="island-slider-item">
-                        <div class="slider-info">
-                            <span>Simulated Speed</span>
-                            <strong id="sim-val-speed">0 km/h</strong>
-                        </div>
-                        <input type="range" id="sim-input-speed" min="0" max="60" value="0" class="apple-range-slider">
-                    </div>
-
-                    <div class="island-slider-item">
-                        <div class="slider-info">
-                            <span>Steering Angle</span>
-                            <strong id="sim-val-rotation">0°</strong>
-                        </div>
-                        <input type="range" id="sim-input-rotation" min="-90" max="90" value="0" class="apple-range-slider">
-                    </div>
-
-                    <div class="island-presets-group">
-                        <button class="btn-island-preset" id="sim-preset-cruise">Cruise</button>
-                        <button class="btn-island-preset" id="sim-preset-curve">Curve</button>
-                        <button class="btn-island-preset" id="sim-preset-stop">Stop</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- ===== INSTAGRAM BOTTOM TAB BAR ===== -->
         <nav class="instagram-bottom-tabbar" id="fb-bottom-tabbar">
@@ -398,10 +344,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const likeCountDisplay = document.getElementById('like-count-display');
+            const btnCommentPost = document.getElementById('btn-comment-post');
             const likeInfographic = document.getElementById('like-infographic');
             const btnInfoClose = document.getElementById('btn-info-close');
             
             likeCountDisplay?.addEventListener('click', () => {
+                likeInfographic?.classList.add('show');
+            });
+            btnCommentPost?.addEventListener('click', () => {
                 likeInfographic?.classList.add('show');
             });
             btnInfoClose?.addEventListener('click', () => {

@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Heart spawn accumulator
         heartAccumulator: 0,
+
+        // Last telemetry sampling timestamp
+        lastSampleTime: 0,
     };
 
     // =========================================================================
@@ -381,36 +384,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const fgPixSize = Math.max(8, Math.round(fgBase + jitter));
         const bgPixSize = Math.max(4, Math.round(bgBase + jitter * 0.3));
 
-        // Grab camera frame
-        offCanvas.width = W;
-        offCanvas.height = H;
-        if (isUsingSharedCamera && sharedFrameImage) {
-            offCtx.drawImage(sharedFrameImage, 0, 0, W, H);
-        } else {
-            offCtx.drawImage(cameraVideo, 0, 0, W, H);
+        const cols = Math.ceil(W / bgPixSize);
+        const rows = Math.ceil(H / bgPixSize);
+
+        // Resize offCanvas ONLY when dimensions change
+        if (offCanvas.width !== cols || offCanvas.height !== rows) {
+            offCanvas.width = cols;
+            offCanvas.height = rows;
         }
+
+        // Downscale camera/video natively via drawImage
+        if (isUsingSharedCamera && sharedFrameImage) {
+            offCtx.drawImage(sharedFrameImage, 0, 0, cols, rows);
+        } else {
+            offCtx.drawImage(cameraVideo, 0, 0, cols, rows);
+        }
+
         let imageData;
         try {
-            imageData = offCtx.getImageData(0, 0, W, H);
+            imageData = offCtx.getImageData(0, 0, cols, rows);
         } catch(e) {
             mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
             return;
         }
         const data = imageData.data;
-
-        // Sample average colour of a rect
-        function sampleRect(sx, sy, sw, sh) {
-            let rr = 0, gg = 0, bb = 0, n = 0;
-            const x0 = Math.max(0, sx), y0 = Math.max(0, sy);
-            const x1 = Math.min(W-1, sx+sw-1), y1 = Math.min(H-1, sy+sh-1);
-            for (let py = y0; py <= y1; py += 2) {
-                for (let px = x0; px <= x1; px += 2) {
-                    const i = (py * W + px) * 4;
-                    rr += data[i]; gg += data[i+1]; bb += data[i+2]; n++;
-                }
-            }
-            return n ? [rr/n, gg/n, bb/n] : [128,128,128];
-        }
 
         // Clear with pure black gap
         mosaicCtx.fillStyle = '#000';
@@ -420,57 +417,129 @@ document.addEventListener('DOMContentLoaded', () => {
         const FG_PALETTE = buildFgPalette();
         const gap = 1;
 
-        // Hash function for coordinate-stable random variations (Ishihara dots feel)
-        function hashCoords(x, y) {
-            const val = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        // Coordinate-stable hash for Ishihara dots
+        function hashCoords(cx, cy) {
+            const val = Math.sin(cx * 12.9898 + cy * 78.233) * 43758.5453;
             return val - Math.floor(val);
         }
 
-        // BG pass — cold-toned small circles
-        for (let y = 0; y < H; y += bgPixSize) {
-            for (let x = 0; x < W; x += bgPixSize) {
-                const fg = getForegroundness(x + bgPixSize/2, y + bgPixSize/2, W, H);
-                if (fg > 0.5) continue;
-                const [r, g, b] = sampleRect(x, y, bgPixSize, bgPixSize);
-                const [qr, qg, qb] = quantize(r, g, b, BG_PALETTE);
-                
-                const stableRand = hashCoords(x, y);
-                const sizeRatio = 0.4 + stableRand * 0.6; // size ratio between 40% and 100%
-                const radius = Math.max(1, ((bgPixSize - gap * 2) / 2) * sizeRatio);
+        // Group background draw commands by color index
+        const bgDrawGroups = Array.from({ length: BG_PALETTE.length }, () => []);
 
-                mosaicCtx.fillStyle = `rgb(${qr},${qg},${qb})`;
-                mosaicCtx.beginPath();
-                mosaicCtx.arc(x + bgPixSize/2, y + bgPixSize/2, radius, 0, Math.PI * 2);
-                mosaicCtx.fill();
+        // BG pass — cold-toned small circles
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const x = c * bgPixSize;
+                const y = r * bgPixSize;
+                const cx = x + bgPixSize / 2;
+                const cy = y + bgPixSize / 2;
+                const fg = getForegroundness(cx, cy, W, H);
+                if (fg > 0.5) continue;
+
+                // Direct array lookup from downscaled image
+                const i = (r * cols + c) * 4;
+                const rr = data[i];
+                const gg = data[i+1];
+                const bb = data[i+2];
+
+                const bestColor = quantize(rr, gg, bb, BG_PALETTE);
+                const colorIdx = BG_PALETTE.indexOf(bestColor);
+                if (colorIdx !== -1) {
+                    const stableRand = hashCoords(c, r);
+                    const sizeRatio = 0.4 + stableRand * 0.6;
+                    const radius = Math.max(1, ((bgPixSize - gap * 2) / 2) * sizeRatio);
+                    bgDrawGroups[colorIdx].push({ cx, cy, radius });
+                }
             }
+        }
+
+        // Draw background circles color-grouped
+        for (let idx = 0; idx < BG_PALETTE.length; idx++) {
+            const list = bgDrawGroups[idx];
+            if (list.length === 0) continue;
+            const [qr, qg, qb] = BG_PALETTE[idx];
+            mosaicCtx.fillStyle = `rgb(${qr},${qg},${qb})`;
+            mosaicCtx.beginPath();
+            for (let j = 0; j < list.length; j++) {
+                const item = list[j];
+                mosaicCtx.moveTo(item.cx + item.radius, item.cy);
+                mosaicCtx.arc(item.cx, item.cy, item.radius, 0, Math.PI * 2);
+            }
+            mosaicCtx.fill();
         }
 
         // FG pass — speed-coded thermal circles mapped from luminance
-        for (let y = 0; y < H; y += fgPixSize) {
-            for (let x = 0; x < W; x += fgPixSize) {
-                const fg = getForegroundness(x + fgPixSize/2, y + fgPixSize/2, W, H);
-                if (fg < 0.15) continue;
-                const [r, g, b] = sampleRect(x, y, fgPixSize, fgPixSize);
-                
-                // Direct thermal mapping based on cell luminance (brightness)
-                const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
-                const colorIdx = Math.min(5, Math.floor(lum * 6));
-                const [qr, qg, qb] = FG_PALETTE[colorIdx];
+        const colsFg = Math.ceil(W / fgPixSize);
+        const rowsFg = Math.ceil(H / fgPixSize);
 
-                mosaicCtx.globalAlpha = Math.min(1, fg * 1.5);
+        // Group foreground draw commands by color & alpha key
+        const fgDrawGroups = {};
+
+        for (let r = 0; r < rowsFg; r++) {
+            for (let c = 0; c < colsFg; c++) {
+                const x = c * fgPixSize;
+                const y = r * fgPixSize;
+                const cx = x + fgPixSize / 2;
+                const cy = y + fgPixSize / 2;
+                const fg = getForegroundness(cx, cy, W, H);
+                if (fg < 0.15) continue;
+
+                // Sample from downscaled background data
+                const bgC = Math.min(cols - 1, Math.floor((cx / W) * cols));
+                const bgR = Math.min(rows - 1, Math.floor((cy / H) * rows));
+                const i = (bgR * cols + bgC) * 4;
+
+                const rr = data[i];
+                const gg = data[i+1];
+                const bb = data[i+2];
+
+                const lum = (rr * 0.299 + gg * 0.587 + bb * 0.114) / 255;
+                const colorIdx = Math.min(5, Math.floor(lum * 6));
+
+                const alpha = Math.min(1, fg * 1.5);
                 const bm = 0.6 + lum * 0.7;
-                
-                const stableRand = hashCoords(x, y);
-                const sizeRatio = 0.4 + stableRand * 0.6; // size ratio between 40% and 100%
+
+                const stableRand = hashCoords(c + 1000, r + 1000);
+                const sizeRatio = 0.4 + stableRand * 0.6;
                 const radius = Math.max(1, ((fgPixSize - gap * 2) / 2) * sizeRatio);
 
-                mosaicCtx.fillStyle = `rgb(${Math.min(255,Math.round(qr*bm))},${Math.min(255,Math.round(qg*bm))},${Math.min(255,Math.round(qb*bm))})`;
-                mosaicCtx.beginPath();
-                mosaicCtx.arc(x + fgPixSize/2, y + fgPixSize/2, radius, 0, Math.PI * 2);
-                mosaicCtx.fill();
-                mosaicCtx.globalAlpha = 1;
+                // Quantize alpha to nearest 0.2 and brightness modifier to nearest 0.1 to allow batching
+                const qAlpha = Math.max(0.2, Math.round(alpha * 5) / 5);
+                const qBm = Math.round(bm * 10) / 10;
+
+                const key = `${colorIdx}_${qBm.toFixed(1)}_${qAlpha.toFixed(1)}`;
+                if (!fgDrawGroups[key]) {
+                    fgDrawGroups[key] = [];
+                }
+                fgDrawGroups[key].push({ cx, cy, radius });
             }
         }
+
+        // Draw foreground circles grouped by color/alpha key
+        for (const key in fgDrawGroups) {
+            const list = fgDrawGroups[key];
+            if (list.length === 0) continue;
+            const parts = key.split('_');
+            const colorIdx = parseInt(parts[0]);
+            const qBm = parseFloat(parts[1]);
+            const qAlpha = parseFloat(parts[2]);
+
+            const [qr, qg, qb] = FG_PALETTE[colorIdx];
+            const cr = Math.min(255, Math.round(qr * qBm));
+            const cg = Math.min(255, Math.round(qg * qBm));
+            const cb = Math.min(255, Math.round(qb * qBm));
+
+            mosaicCtx.globalAlpha = qAlpha;
+            mosaicCtx.fillStyle = `rgb(${cr},${cg},${cb})`;
+            mosaicCtx.beginPath();
+            for (let j = 0; j < list.length; j++) {
+                const item = list[j];
+                mosaicCtx.moveTo(item.cx + item.radius, item.cy);
+                mosaicCtx.arc(item.cx, item.cy, item.radius, 0, Math.PI * 2);
+            }
+            mosaicCtx.fill();
+        }
+        mosaicCtx.globalAlpha = 1.0;
 
         mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
     }
@@ -833,9 +902,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- 1. SPEED: Accumulate ride telemetry ---
         if (state.isOperating && state.speed > 0) {
             state.rideDurationSec += dt;
-            state.speedSamples.push(state.speed);
-            // Cap samples array to avoid memory growth
-            if (state.speedSamples.length > 3600) state.speedSamples.shift();
+            const now = Date.now();
+            if (now - state.lastSampleTime >= 1000) {
+                state.speedSamples.push(state.speed);
+                state.lastSampleTime = now;
+                // Cap samples array to avoid memory growth (3600 samples = 1 hour)
+                if (state.speedSamples.length > 3600) state.speedSamples.shift();
+            }
         }
  
         // --- 2. STEER: Palette hue shift ---
@@ -921,37 +994,86 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI UPDATERS
     // =========================================================================
     function updateUI() {
-        if (simInputSpeed)    simInputSpeed.value    = state.speed;
-        if (simInputRotation) simInputRotation.value = state.rotation;
+        const speedVal = state.speed;
+        const rotVal = state.rotation;
 
-        if (simValSpeed)    simValSpeed.textContent    = `${state.speed} km/h`;
-        if (simValRotation) simValRotation.textContent = `${state.rotation}°`;
+        const speedRound = speedVal.toFixed(1);
+        const rotRound = Math.round(rotVal);
 
-        if (islandStatSpeed) islandStatSpeed.textContent = `${state.speed.toFixed(1)} km/h`;
-        if (islandStatRot)   islandStatRot.textContent   = `${Math.round(state.rotation)}°`;
+        // Update range inputs only when active simulation override is off (avoid fighting with user drag)
+        if (simInputSpeed && !state.simManualOverride) {
+            const valStr = String(Math.round(speedVal));
+            if (simInputSpeed.value !== valStr) simInputSpeed.value = valStr;
+        }
+        if (simInputRotation && !state.simManualOverride) {
+            const valStr = String(rotRound);
+            if (simInputRotation.value !== valStr) simInputRotation.value = valStr;
+        }
 
-        if (overlaySpeed)    overlaySpeed.textContent    = `${state.speed.toFixed(1)} km/h`;
-        if (overlayRotation) overlayRotation.textContent = `${Math.round(state.rotation)}°`;
+        const speedText = `${speedRound} km/h`;
+        const rotText = `${rotRound}°`;
+
+        if (simValSpeed && simValSpeed.textContent !== speedText) {
+            simValSpeed.textContent = speedText;
+        }
+        if (simValRotation && simValRotation.textContent !== rotText) {
+            simValRotation.textContent = rotText;
+        }
+
+        if (islandStatSpeed && islandStatSpeed.textContent !== speedText) {
+            islandStatSpeed.textContent = speedText;
+        }
+        if (islandStatRot && islandStatRot.textContent !== rotText) {
+            islandStatRot.textContent = rotText;
+        }
+
+        if (overlaySpeed && overlaySpeed.textContent !== speedText) {
+            overlaySpeed.textContent = speedText;
+        }
+        if (overlayRotation && overlayRotation.textContent !== rotText) {
+            overlayRotation.textContent = rotText;
+        }
 
         if (overlayStatusIndicator) {
+            let statusText = 'OFFLINE';
+            let statusClass = 'hud-item status-indicator';
             if (state.isOperating) {
-                const isLive = state.speed >= LIVE_SPEED_THRESHOLD;
-                overlayStatusIndicator.textContent  = isLive ? 'LIVE' : (state.speed > 0 ? 'STARTING' : 'STATIONARY');
-                overlayStatusIndicator.className    = 'hud-item status-indicator' + (state.speed > 0 ? ' active' : '');
-            } else {
-                overlayStatusIndicator.textContent = 'OFFLINE';
-                overlayStatusIndicator.className   = 'hud-item status-indicator';
+                const isLive = speedVal >= LIVE_SPEED_THRESHOLD;
+                statusText = isLive ? 'LIVE' : (speedVal > 0 ? 'STARTING' : 'STATIONARY');
+                statusClass = 'hud-item status-indicator' + (speedVal > 0 ? ' active' : '');
+            }
+            if (overlayStatusIndicator.textContent !== statusText) {
+                overlayStatusIndicator.textContent = statusText;
+            }
+            if (overlayStatusIndicator.className !== statusClass) {
+                overlayStatusIndicator.className = statusClass;
             }
         }
 
         // Update Like Infographic telemetry
-        if (infoValSpeed)    infoValSpeed.textContent    = `${state.speed.toFixed(1)} km/h`;
-        if (infoValSteer)    infoValSteer.textContent    = `${Math.round(state.rotation)}°`;
-        if (infoValDist)     infoValDist.textContent     = `${state.totalDistanceKm.toFixed(2)} km`;
-        if (infoValDuration) infoValDuration.textContent = `${Math.floor(state.rideDurationSec)}s`;
+        if (infoValSpeed && infoValSpeed.textContent !== speedText) {
+            infoValSpeed.textContent = speedText;
+        }
+        if (infoValSteer && infoValSteer.textContent !== rotText) {
+            infoValSteer.textContent = rotText;
+        }
+
+        const distText = `${state.totalDistanceKm.toFixed(2)} km`;
+        if (infoValDist && infoValDist.textContent !== distText) {
+            infoValDist.textContent = distText;
+        }
+
+        const durationText = `${Math.floor(state.rideDurationSec)}s`;
+        if (infoValDuration && infoValDuration.textContent !== durationText) {
+            infoValDuration.textContent = durationText;
+        }
+
         if (infoValLoc) {
             const zone = LOCATION_ZONES[currentZoneIndex];
-            infoValLoc.textContent = `📍 ${zone ? zone.name : 'Seoul'}`;
+            const locText = `📍 ${zone ? zone.name : 'Seoul'}`;
+            if (infoValLoc.textContent !== locText) {
+                infoValLoc.textContent = locText;
+            }
         }
     }
 
