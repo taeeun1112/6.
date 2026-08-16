@@ -179,7 +179,7 @@ button {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding-bottom: calc(var(--bottom-tab-height) + 36px); /* Extra spacing for floating capsule */
+    padding-bottom: 0;
     /* Hide scrollbar */
     scrollbar-width: none; /* Firefox */
 }
@@ -656,7 +656,7 @@ button {
 }
 
 .instagram-caption-row {
-    padding: 0 14px 16px;
+    padding: 0 14px calc(var(--bottom-tab-height) + 36px); /* Spacing inside card to keep text above tab bar */
     font-size: 14px;
     line-height: 1.4;
 }
