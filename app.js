@@ -109,15 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const completedCaption   = document.getElementById('completed-caption');
     const completedTimestamp = document.getElementById('completed-timestamp');
 
-    // Infographic elements
+    // Infographic elements (removed as requested)
     const btnLikePost        = document.getElementById('btn-like-post');
-    const likeInfographic    = document.getElementById('like-infographic');
-    const btnInfoClose       = document.getElementById('btn-info-close');
-    const infoValSpeed       = document.getElementById('info-val-speed');
-    const infoValSteer       = document.getElementById('info-val-steer');
-    const infoValDist        = document.getElementById('info-val-dist');
-    const infoValDuration    = document.getElementById('info-val-duration');
-    const infoValLoc         = document.getElementById('info-val-loc');
 
     // =========================================================================
     // CLOCK
@@ -1052,31 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Update Like Infographic telemetry
-        if (infoValSpeed && infoValSpeed.textContent !== speedText) {
-            infoValSpeed.textContent = speedText;
-        }
-        if (infoValSteer && infoValSteer.textContent !== rotText) {
-            infoValSteer.textContent = rotText;
-        }
 
-        const distText = `${state.totalDistanceKm.toFixed(2)} km`;
-        if (infoValDist && infoValDist.textContent !== distText) {
-            infoValDist.textContent = distText;
-        }
-
-        const durationText = `${Math.floor(state.rideDurationSec)}s`;
-        if (infoValDuration && infoValDuration.textContent !== durationText) {
-            infoValDuration.textContent = durationText;
-        }
-
-        if (infoValLoc) {
-            const zone = LOCATION_ZONES[currentZoneIndex];
-            const locText = `📍 ${zone ? zone.name : 'Seoul'}`;
-            if (infoValLoc.textContent !== locText) {
-                infoValLoc.textContent = locText;
-            }
-        }
     }
 
     // =========================================================================
