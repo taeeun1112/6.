@@ -1266,3 +1266,106 @@ button {
         opacity: 0;
     }
 }
+
+/* ==========================================================================
+   14. iOS STATUS BAR
+   ========================================================================== */
+.ios-status-bar {
+    height: 38px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ig-card-bg);
+    color: var(--ig-text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    user-select: none;
+    z-index: 1100;
+    position: relative;
+    border-top-left-radius: 20px; /* match shell radius */
+    border-top-right-radius: 20px;
+}
+
+.ios-status-bar-left {
+    display: flex;
+    align-items: center;
+    width: 60px;
+}
+
+.ios-time {
+    font-variant-numeric: tabular-nums;
+}
+
+.ios-status-bar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ios-dynamic-island {
+    width: 96px;
+    height: 22px;
+    background: #000000;
+    border-radius: 11px;
+}
+
+.ios-status-bar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 60px;
+}
+
+.ios-status-icon {
+    width: 15px;
+    height: 15px;
+    color: var(--ig-text-primary);
+}
+
+.ios-signal {
+    width: 16px;
+    height: 10px;
+}
+
+.ios-wifi {
+    width: 14px;
+    height: 14px;
+}
+
+.ios-battery-wrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 22px;
+    height: 11px;
+}
+
+.ios-battery-body {
+    width: 20px;
+    height: 11px;
+    border: 1px solid var(--ig-text-primary);
+    border-radius: 3px;
+    padding: 1px;
+    box-sizing: border-box;
+    display: flex;
+}
+
+.ios-battery-level {
+    height: 100%;
+    width: 85%; /* battery percentage simulated */
+    background: var(--ig-text-primary);
+    border-radius: 1.5px;
+}
+
+.ios-battery-tip {
+    width: 1.5px;
+    height: 4px;
+    background: var(--ig-text-primary);
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    margin-left: 0.5px;
+}

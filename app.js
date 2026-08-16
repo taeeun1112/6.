@@ -116,14 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // CLOCK
     // =========================================================================
     function updateClock() {
-        const el = document.getElementById('current-time');
-        if (!el) return;
         const now = new Date();
-        let h = now.getHours();
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-        el.textContent = `${h}:${m} ${ampm}`;
+        const hrs = now.getHours();
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        
+        // Update iPhone status bar time
+        const iosTime = document.getElementById('ios-time');
+        if (iosTime) {
+            iosTime.textContent = `${hrs}:${mins}`;
+        }
+
+        // Update standard clock if any
+        const el = document.getElementById('current-time');
+        if (el) {
+            let h = hrs;
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            el.textContent = `${h}:${mins} ${ampm}`;
+        }
     }
     setInterval(updateClock, 1000);
     updateClock();

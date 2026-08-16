@@ -12,6 +12,40 @@
 <body>
     <!-- ===== PHYSICAL MOBILE DEVICE MOCK SHELL ===== -->
     <div class="instagram-mobile-shell">
+        <!-- ===== iOS STATUS BAR ===== -->
+        <div class="ios-status-bar">
+            <div class="ios-status-bar-left">
+                <span class="ios-time" id="ios-time">9:41</span>
+            </div>
+            <div class="ios-status-bar-center">
+                <div class="ios-dynamic-island"></div>
+            </div>
+            <div class="ios-status-bar-right">
+                <!-- Cellular Icon -->
+                <svg class="ios-status-icon ios-signal" viewBox="0 0 18 12" fill="currentColor">
+                    <rect x="0" y="8" width="2.5" height="4" rx="0.5" />
+                    <rect x="4" y="6" width="2.5" height="6" rx="0.5" />
+                    <rect x="8" y="4" width="2.5" height="8" rx="0.5" />
+                    <rect x="12" y="2" width="2.5" height="10" rx="0.5" />
+                    <rect x="16" y="0" width="2.5" height="12" rx="0.5" />
+                </svg>
+                <!-- Wi-Fi Icon -->
+                <svg class="ios-status-icon ios-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                    <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3" />
+                </svg>
+                <!-- Battery Icon -->
+                <div class="ios-battery-wrap">
+                    <div class="ios-battery-body">
+                        <div class="ios-battery-level"></div>
+                    </div>
+                    <div class="ios-battery-tip"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- ===== INSTAGRAM HEADER ===== -->
         <header class="instagram-header" id="main-navbar">
