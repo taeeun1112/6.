@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = {
         speed: 0,               // km/h  (0–60)
         rotation: 0,            // degrees (-90 to 90)
-        isOperating: true,      // engine on/off
+        isOperating: false,     // engine on/off (starts stopped at 0 km/h)
         currentScrollSpeed: 0,  // inertia for scroll
         lastTime: performance.now(),
 
@@ -889,14 +889,14 @@ document.addEventListener('DOMContentLoaded', () => {
             isUsingSharedTelemetry = false;
         }
 
-        // Auto-simulate active riding state: smooth speed & rotation curves
+        // Auto-simulate active riding state only when explicitly operating
         if (state.isOperating) {
             if (!state.simManualOverride && !isUsingSharedTelemetry) {
                 state.speed = 24.5 + Math.sin(Date.now() / 6000) * 8.5;
                 state.rotation = Math.sin(Date.now() / 3200) * 35;
             }
         } else {
-            if (!isUsingSharedTelemetry) {
+            if (!isUsingSharedTelemetry && !state.simManualOverride) {
                 state.speed = 0;
                 state.rotation = 0;
             }
