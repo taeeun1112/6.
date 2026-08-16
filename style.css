@@ -179,7 +179,7 @@ button {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding-bottom: 0;
+    padding-bottom: calc(var(--bottom-tab-height) + 12px);
     /* Hide scrollbar */
     scrollbar-width: none; /* Firefox */
 }
