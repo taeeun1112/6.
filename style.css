@@ -22,7 +22,7 @@
     --ig-green: #00ca4e;
     
     --header-height: 54px;
-    --bottom-tab-height: 52px;
+    --bottom-tab-height: 60px; /* Adjusted height for capsule tab bar */
 
     /* Base Font Family */
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -179,7 +179,7 @@ button {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding-bottom: calc(var(--bottom-tab-height) + 12px);
+    padding-bottom: calc(var(--bottom-tab-height) + 36px); /* Extra spacing for floating capsule */
     /* Hide scrollbar */
     scrollbar-width: none; /* Firefox */
 }
@@ -1022,17 +1022,21 @@ button {
    -------------------------------------------------------------------------- */
 .instagram-bottom-tabbar {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
     height: var(--bottom-tab-height);
-    background: var(--ig-card-bg);
-    border-top: 1px solid var(--ig-border-light);
+    background: rgba(255, 255, 255, 0.7); /* Transparent white */
+    backdrop-filter: blur(20px); /* Blur behind */
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Glass outline */
+    border-radius: 30px; /* Capsule rounded corners */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: space-around;
-    z-index: 300;
-    padding-bottom: 4px;
+    padding: 0 8px;
+    z-index: 1000;
 }
 
 .instagram-bottom-tab {
@@ -1040,8 +1044,10 @@ button {
     align-items: center;
     justify-content: center;
     color: var(--ig-text-primary);
-    flex: 1;
-    height: 100%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .nav-icon {
@@ -1051,20 +1057,47 @@ button {
 
 .instagram-bottom-tab.active {
     color: #000000;
+    background: rgba(0, 0, 0, 0.06); /* Active indicator pill background */
+    width: auto;
+    border-radius: 22px;
+    padding: 0 20px;
+}
+
+.profile-avatar-wrap {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
 }
 
 .instagram-nav-profile-avatar {
-    width: 24px;
-    height: 24px;
-    background: #000000;
-    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    background: #e2e8f0; /* Light gray circle background */
+    color: #4a5568; /* Gray silhouette color */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
-    font-weight: bold;
-    border: 1px solid var(--ig-text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.avatar-silhouette {
+    width: 20px;
+    height: 20px;
+}
+
+.profile-avatar-wrap .notification-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    background: #ff3b30; /* Red dot */
+    border: 1.5px solid #ffffff; /* White outline */
+    border-radius: 50%;
+    z-index: 10;
 }
 
 /* --------------------------------------------------------------------------
