@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // CAMERA + ISHIHARA MOSAIC
     // =========================================================================
-    let mosaicPixelSize = 20;
+    let mosaicPixelSize = 36;
     let cameraActive    = false;
     let mosaicAnimFrame = null;
     let frameCount      = 0;
