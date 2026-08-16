@@ -226,10 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    /** Speed → foreground pixel size (12–36px). Inverted: fast speed = many pixels (12px), slow = few (36px) */
+    /** Speed → foreground pixel size (6–36px). Inverted: fast speed = fine pixels (6px), slow = coarse (36px) */
     function speedToMosaicSize(speed) {
-        const minPx = 12, maxPx = 36;
-        // Reach maximum clarity (12px) at 25 km/h instead of 60 km/h
+        const minPx = 6, maxPx = 36;
+        // Reach maximum clarity (6px) at 25 km/h instead of 60 km/h
         // Linear transition for responsive and clear visual feedback during active riding
         const eased = Math.min(1, speed / 25);
         return Math.round(maxPx - eased * (maxPx - minPx));
