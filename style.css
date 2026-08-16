@@ -75,7 +75,7 @@ button {
 .instagram-mobile-shell {
     position: relative;
     width: 100%;
-    max-width: 600px; /* Centered feed width */
+    max-width: 450px; /* Centered feed width (sleeker smartphone feel) */
     height: 95vh; /* Fits cleanly inside desktop viewport */
     background: var(--ig-card-bg);
     border: 1px solid var(--ig-border);
@@ -88,7 +88,7 @@ button {
 }
 
 /* Responsive details: fill screen on actual mobile devices */
-@media (max-width: 600px) {
+@media (max-width: 450px) {
     body {
         background-color: var(--ig-card-bg);
     }
@@ -176,8 +176,10 @@ button {
 
 .fb-center-feed {
     flex: 1;
-    overflow-y: scroll;
-    padding-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-bottom: 0;
     /* Hide scrollbar */
     scrollbar-width: none; /* Firefox */
 }
@@ -199,6 +201,14 @@ button {
 
 .instagram-post-card:not(:last-of-type) {
     margin-bottom: 16px;
+}
+
+.featured-post {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0 !important;
 }
 
 /* Post User Row (Header) */
@@ -306,7 +316,8 @@ button {
 .fb-post-media {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 5; /* Taller rectangular post media */
+    flex: 1; /* Stretch to fill available vertical space */
+    min-height: 0;
     background: #000000;
     overflow: hidden;
 }

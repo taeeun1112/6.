@@ -949,8 +949,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
  
-        // --- 7. SPEED + STEER → Feed scroll ---
+        // --- 7. SPEED + STEER → Feed scroll (disabled as requested) ---
         // Speed adds base forward scroll, steer adds directional component
+        /*
         if (feedMainLayout) {
             let targetScroll = 0;
             if (state.isOperating && state.speed > 0) {
@@ -966,6 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 feedMainLayout.scrollTop += state.currentScrollSpeed * dt;
             }
         }
+        */
  
         // --- 8. LIVE toggle check ---
         checkLiveToggle();
