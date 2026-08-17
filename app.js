@@ -225,6 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    if (window.ResizeObserver && passengerMedia) {
+        const ro = new ResizeObserver(() => {
+            resizeCanvas();
+        });
+        ro.observe(passengerMedia);
+    }
 
     /** Speed → foreground pixel size (6–36px). Inverted: fast speed = fine pixels (6px), slow = coarse (36px) */
     function speedToMosaicSize(speed) {

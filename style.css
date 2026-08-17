@@ -70,25 +70,31 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   3. PHYSICAL MOBILE DEVICE MOCK SHELL (Desktop-first wrapper)
+   3. PHYSICAL MOBILE DEVICE MOCK SHELL (Responsive 32" Exhibition & Desktop)
    -------------------------------------------------------------------------- */
 .instagram-mobile-shell {
     position: relative;
-    width: 100%;
-    max-width: 450px; /* Centered feed width (sleeker smartphone feel) */
-    height: 95vh; /* Fits cleanly inside desktop viewport */
+    /* Fills 100% height of 32" monitor or desktop display */
+    height: 100vh;
+    width: calc(100vh * (9 / 19.5));
+    aspect-ratio: 9 / 19.5; /* Authentic smartphone aspect ratio (iPhone 15/16 Pro) */
+    max-width: 100vw;
     background: var(--ig-card-bg);
-    border: 1px solid var(--ig-border);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: none;
+    border-bottom: none;
+    border-radius: 0;
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     z-index: 10;
+    container-type: inline-size;
 }
 
 /* Responsive details: fill screen on actual mobile devices */
-@media (max-width: 450px) {
+@media (max-width: 500px), (max-aspect-ratio: 9/19.5) {
     body {
         background-color: var(--ig-card-bg);
     }
@@ -1284,8 +1290,6 @@ button {
     user-select: none;
     z-index: 1100;
     position: relative;
-    border-top-left-radius: 20px; /* match shell radius */
-    border-top-right-radius: 20px;
 }
 
 .ios-status-bar-left {
