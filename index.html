@@ -4,111 +4,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram</title>
-    <meta name="description" content="Instagram - 사진과 동영상을 공유하고 소통해보세요.">
+    <title>Instagram - HumanInterfaced</title>
+    <meta name="description" content="HumanInterfaced - 2026 한국문화예술위원회 예비예술인 지원사업 융복합 미디어아트 전시">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!-- ===== PHYSICAL MOBILE DEVICE MOCK SHELL ===== -->
-    <div class="instagram-mobile-shell">
-        <!-- ===== iOS STATUS BAR ===== -->
-        <div class="ios-status-bar">
-            <div class="ios-status-bar-left">
-                <span class="ios-time" id="ios-time">9:41</span>
-            </div>
-            <div class="ios-status-bar-center">
-                <div class="ios-dynamic-island"></div>
-            </div>
-            <div class="ios-status-bar-right">
-                <!-- Cellular Icon -->
-                <svg class="ios-status-icon ios-signal" viewBox="0 0 18 12" fill="currentColor">
-                    <rect x="0" y="8" width="2.5" height="4" rx="0.5" />
-                    <rect x="4" y="6" width="2.5" height="6" rx="0.5" />
-                    <rect x="8" y="4" width="2.5" height="8" rx="0.5" />
-                    <rect x="12" y="2" width="2.5" height="10" rx="0.5" />
-                    <rect x="16" y="0" width="2.5" height="12" rx="0.5" />
-                </svg>
-                <!-- Wi-Fi Icon -->
-                <svg class="ios-status-icon ios-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-                    <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3" />
-                </svg>
-                <!-- Battery Icon -->
-                <div class="ios-battery-wrap">
-                    <div class="ios-battery-body">
-                        <div class="ios-battery-level"></div>
-                    </div>
-                    <div class="ios-battery-tip"></div>
-                </div>
-            </div>
-        </div>
+    <!-- ===== PC DESKTOP SHELL FOR 32" MONITOR ===== -->
+    <div class="instagram-pc-shell">
 
-        <!-- ===== INSTAGRAM HEADER ===== -->
-        <header class="instagram-header" id="main-navbar">
-            <div class="instagram-header-inner">
-                <button class="instagram-back-btn" onclick="alert('뒤로 가기')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                        stroke-linejoin="round" class="chevron-icon">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                <div class="instagram-header-title" id="brand-logo">
-                    <span class="instagram-title-main">게시물</span>
-                    <span class="instagram-title-sub">HumanInterfaced</span>
+        <!-- ===== LEFT NAVIGATION SIDEBAR ===== -->
+        <aside class="instagram-desktop-sidebar">
+            <div class="sidebar-top">
+                <div class="brand-logo-wrap">
+                    <span class="brand-title">Human Interfaced</span>
                 </div>
-                <button class="instagram-menu-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                        stroke-linejoin="round" class="menu-icon">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                    </svg>
-                </button>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="nav-icon"><path d="M22 9.762V22a1 1 0 0 1-1 1h-6.234a1 1 0 0 1-1-1v-6.385a1 1 0 0 0-1-1H11.23a1 1 0 0 0-1 1V22a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9.762a1 1 0 0 1 .33-.746l8.5-7.727a1 1 0 0 1 1.34 0l8.5 7.727a1 1 0 0 1 .33.746z"/></svg>
+                        <span>홈</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <span>검색</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        <span>탐색</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect><polygon points="10 9 15 12 10 15 10 9" fill="currentColor"></polygon></svg>
+                        <span>릴스</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <span>메시지</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        <span>알림</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        <span>만들기</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="instagram-nav-profile-avatar">
+                            <span class="instagram-avatar-letter">H</span>
+                        </div>
+                        <span>프로필</span>
+                    </a>
+                </nav>
             </div>
-        </header>
+
+            <!-- Sidebar Bottom Info Badge Card -->
+            <div class="sidebar-bottom">
+                <div class="exhibition-badge-card">
+                    <span class="exhibition-tag">EXHIBITION</span>
+                    <span class="exhibition-time" id="ios-time">9:41</span>
+                    <div class="exhibition-status"><span class="status-dot"></span> 32" Widescreen PC Display</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Hidden / Backwards Compatibility Elements for JS selector safety -->
+        <div class="ios-status-bar" style="display:none;"></div>
+        <header class="instagram-header" id="main-navbar" style="display:none;"></header>
+        <nav class="instagram-bottom-tabbar" id="fb-bottom-tabbar" style="display:none;"></nav>
 
         <!-- ===== MAIN PAGE VIEWPORT ===== -->
         <div class="fb-page-wrap">
-
-            <!-- Hidden Left Sidebar (kept for compatibility with any CSS selectors, display: none in CSS) -->
-            <aside class="fb-left-sidebar" style="display: none;"></aside>
-
-            <!-- ===== CENTER INSTAGRAM FEED ===== -->
             <main class="fb-center-feed" id="fb-center-feed">
 
-                <!-- ===== POST 1: LIVE RIDE ISHIHARA MOSAIC ===== -->
-                <article class="instagram-post-card featured-post" id="passenger-post-card">
+                <!-- ===== POST 1: ISHIHARA MOSAIC (PC HORIZONTAL DESKTOP VIEW) ===== -->
+                <article class="instagram-post-card featured-post pc-desktop-post" id="passenger-post-card">
 
-                    <!-- Post Header: User Profile Info -->
-                    <div class="instagram-post-user-row">
-                        <div class="instagram-user-avatar-wrap">
-                            <div class="instagram-user-avatar-story-ring">
-                                <div class="instagram-user-avatar-inner">
-                                    <span class="instagram-avatar-letter">H</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="instagram-user-info">
-                            <div class="instagram-username-line">
-                                <a href="#" class="instagram-post-author-name">HumanInterfaced</a>
-                            </div>
-                        </div>
-                        <div class="instagram-live-badge-wrap">
-                        </div>
-                        <button class="instagram-post-options-btn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                stroke-linecap="round" stroke-linejoin="round" class="options-dots-icon">
-                                <circle cx="12" cy="12" r="1"></circle>
-                                <circle cx="19" cy="12" r="1"></circle>
-                                <circle cx="5" cy="12" r="1"></circle>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Post Media: Color Blindness Test (Ishihara Mosaic) -->
+                    <!-- LEFT COLUMN: Post Media Stage (Ishihara Mosaic Widescreen) -->
                     <div class="fb-post-media" id="passenger-media-container">
                         <!-- Hidden video for camera stream -->
                         <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
@@ -116,43 +87,8 @@
                         <!-- Mosaic canvas: pixelated live camera feed -->
                         <canvas id="mosaic-canvas" class="mosaic-canvas-layer"></canvas>
 
-                        <!-- Speed line particle canvas overlay (hidden/cleared by JS) -->
+                        <!-- Speed line particle canvas overlay -->
                         <canvas id="riding-particles-canvas"></canvas>
-
-                        <!-- HUD Overlay (hidden as requested)
-                        <div class="hud-capsule shadow-sm">
-                            <div class="hud-item">
-                                <span class="lbl">SPEED</span>
-                                <strong id="overlay-speed">0.0 km/h</strong>
-                            </div>
-                            <div class="hud-separator"></div>
-                            <div class="hud-item">
-                                <span class="lbl">STEER</span>
-                                <strong id="overlay-rotation">0°</strong>
-                            </div>
-                            <div class="hud-separator"></div>
-                            <div class="hud-item status-indicator" id="overlay-status-indicator">STATIONARY</div>
-                        </div>
-                        -->
-
-                        <!-- Camera Permission Overlay -->
-                        <div class="camera-permission-overlay" id="camera-permission-overlay">
-                            <div class="camera-permission-box">
-                                <div class="camera-icon-wrap">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
-                                            fill="currentColor" />
-                                    </svg>
-                                </div>
-                                <h3>카메라 접근 필요</h3>
-                                <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
-                                <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
-                            </div>
-                        </div>
 
                         <!-- Steer Edge Glows -->
                         <div class="steer-glow-indicator left-glow" id="left-steer-glow"></div>
@@ -161,103 +97,118 @@
                         <!-- Foreground zone ellipse hint -->
                         <div class="fg-zone-hint" id="fg-zone-hint"></div>
 
-                        <!-- Mosaic Intensity Control (Ishihara Mode) -->
+                        <!-- Camera Permission Overlay -->
+                        <div class="camera-permission-overlay" id="camera-permission-overlay">
+                            <div class="camera-permission-box">
+                                <div class="camera-icon-wrap">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z" fill="currentColor" />
+                                        <path d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <h3>카메라 접근 필요</h3>
+                                <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
+                                <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
+                            </div>
+                        </div>
+
+                        <!-- Mosaic Intensity Control Overlay Slider -->
                         <div class="mosaic-control-badge" id="mosaic-control-badge">
                             <span class="mosaic-label">SPEED</span>
-                            <input type="range" id="mosaic-intensity" min="6" max="36" value="36"
-                                class="mosaic-slider">
+                            <input type="range" id="mosaic-intensity" min="6" max="36" value="36" class="mosaic-slider">
                             <span id="mosaic-val">36px</span>
                         </div>
                     </div>
 
-                    <!-- Page Indicators (Carousel Dots) -->
-                    <div class="instagram-carousel-dots">
-                        <span class="dot active"></span>
-                        <span class="dot"></span>
-                    </div>
+                    <!-- RIGHT COLUMN: Post Info & Interactive Controls Panel -->
+                    <div class="pc-post-info-panel">
 
-                    <!-- Action Buttons -->
-                    <div class="instagram-post-actions-row">
-                        <div class="left-actions">
-                            <button class="instagram-action-btn like-btn active" id="btn-like-post">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="action-icon stroke-heart">
-                                    <path
-                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <button class="instagram-action-btn" id="btn-comment-post">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                                    <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22z"></path>
-                                </svg>
-                            </button>
-                            <button class="instagram-action-btn repost-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                                    <polyline points="17 1 21 5 17 9"></polyline>
-                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                                    <polyline points="7 23 3 19 7 15"></polyline>
-                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-                                </svg>
-                            </button>
-                            <button class="instagram-action-btn" id="btn-share-post">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        <!-- Post User Header -->
+                        <div class="instagram-post-user-row">
+                            <div class="instagram-user-avatar-wrap">
+                                <div class="instagram-user-avatar-story-ring">
+                                    <div class="instagram-user-avatar-inner">
+                                        <span class="instagram-avatar-letter">H</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="instagram-user-info">
+                                <div class="instagram-username-line">
+                                    <a href="#" class="instagram-post-author-name">HumanInterfaced</a>
+                                    <div class="instagram-post-location-tag" id="post-location-tag">서울예술대학교 남산캠퍼스 심재순관</div>
+                                </div>
+                            </div>
+                            <div class="instagram-live-badge-wrap"></div>
+                            <button class="instagram-post-options-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="options-dots-icon">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
                         </div>
-                        <button class="instagram-action-btn save-btn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                        </button>
-                        <!-- Dynamic Like Burst Container -->
-                        <div id="heart-burst-container" class="heart-burst-container"></div>
-                    </div>
 
-                    <!-- Likes Row -->
-                    <div class="instagram-likes-row">
-                        <span class="fb-reaction-count" id="like-count-display">
-                            daekyeong_design님 외 <strong id="like-count-num">1,203</strong>명이 좋아합니다
-                        </span>
-                    </div>
-
-                    <!-- Caption & Description Row -->
-                    <div class="instagram-caption-row">
-                        <div class="instagram-caption-content">
-                            <a href="#" class="caption-username">HumanInterfaced</a>
-                            <span class="caption-text">2026 한국문화예술위원회 예비예술인 지원사업</span>
-                        </div>
-                        <div class="instagram-caption-sub">
-                            융복합 미디어아트 전시 【Undefined】
+                        <!-- Post Caption Content -->
+                        <div class="instagram-caption-row pc-caption-panel">
+                            <div class="instagram-caption-content">
+                                <a href="#" class="caption-username">HumanInterfaced</a>
+                                <span class="caption-text">⿻ 융복합 미디어아트 전시 【Undefined】</span>
+                            </div>
+                            <div class="exhibition-description-box">
+                                <div class="artwork-heading">𝘼𝙧𝙩𝙬𝙤𝙧𝙠 𝘿𝙚𝙨𝙘𝙧𝙞𝙥𝙩𝙞𝙤𝙣</div>
+                                <div class="exhibition-info-line">⿻ 2026.08.21(금) - 08.23(일)</div>
+                                <div class="exhibition-info-line">⿻ 15:00 - 21:00</div>
+                                <div class="exhibition-info-line">⿻ 서울시 중구 예장동 소파로 138 (서울예술대학교 남산캠퍼스 문화예술산업융합센터)</div>
+                            </div>
                         </div>
 
-                        <!-- Telemetry Caption (Hidden as requested) -->
-                        <!--
-                        <div class="instagram-telemetry-caption">
-                            드디어 신형 모빌리티 라이딩 기능 테스트 중! 실시간 모자이크 카메라 피드로 주행 영상 공유 중 🛴💨<br>
-                            <span class="instagram-post-tags">#미래모빌리티 #애플디자인 #인터랙티브UI #라이드쉐어</span>
-                        </div>
-                        -->
+                        <div class="pc-panel-spacer"></div>
 
-                        <!-- Comments section link (Hidden as requested) -->
-                        <!--
-                        <div class="instagram-comments-teaser">
-                            댓글 <span id="comment-count-num">88</span>개 모두 보기
-                        </div>
-                        -->
+                        <!-- Action Buttons & Likes -->
+                        <div class="pc-post-bottom-actions">
+                            <div class="instagram-post-actions-row">
+                                <div class="left-actions">
+                                    <button class="instagram-action-btn like-btn active" id="btn-like-post">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon stroke-heart">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="instagram-action-btn" id="btn-comment-post">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
+                                            <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="instagram-action-btn repost-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
+                                            <polyline points="17 1 21 5 17 9"></polyline>
+                                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                            <polyline points="7 23 3 19 7 15"></polyline>
+                                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="instagram-action-btn" id="btn-share-post">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
+                                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <button class="instagram-action-btn save-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                                <!-- Dynamic Like Burst Container -->
+                                <div id="heart-burst-container" class="heart-burst-container"></div>
+                            </div>
 
-                        <!-- Post Date (Hidden as requested) -->
-                        <!--
-                        <div class="instagram-post-date">
-                            8월 4일
+                            <!-- Likes Row -->
+                            <div class="instagram-likes-row">
+                                <span class="fb-reaction-count" id="like-count-display">
+                                    daekyeong_design님 외 <strong id="like-count-num">1,203</strong>명이 좋아합니다
+                                </span>
+                            </div>
                         </div>
-                        -->
                     </div>
                 </article>
 
@@ -292,32 +243,13 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons for Completed Post -->
                     <div class="instagram-post-actions-row">
                         <div class="left-actions">
-                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="action-icon">
-                                    <path
-                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                                    </path>
-                                </svg></button>
-                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="action-icon">
-                                    <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22z"></path>
-                                </svg></button>
-                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="action-icon">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                </svg></button>
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22z"></path></svg></button>
+                            <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
                         </div>
-                        <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                            </svg></button>
+                        <button class="instagram-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="action-icon"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
                     </div>
 
                     <div class="instagram-caption-row">
@@ -332,52 +264,8 @@
                 </article>
 
             </main>
-
-            <!-- Hidden Right Sidebar (kept for selectors) -->
-            <aside class="fb-right-sidebar" style="display: none;"></aside>
         </div>
-
-
-        <!-- ===== INSTAGRAM BOTTOM TAB BAR ===== -->
-        <nav class="instagram-bottom-tabbar" id="fb-bottom-tabbar">
-            <a href="#" class="instagram-bottom-tab active" id="tab-home" title="Home">
-                <svg viewBox="0 0 24 24" fill="currentColor" class="nav-icon">
-                    <path
-                        d="M22 9.762V22a1 1 0 0 1-1 1h-6.234a1 1 0 0 1-1-1v-6.385a1 1 0 0 0-1-1H11.23a1 1 0 0 0-1 1V22a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9.762a1 1 0 0 1 .33-.746l8.5-7.727a1 1 0 0 1 1.34 0l8.5 7.727a1 1 0 0 1 .33.746z" />
-                </svg>
-            </a>
-            <a href="#" class="instagram-bottom-tab" id="tab-reels" title="Reels">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                    stroke-linejoin="round" class="nav-icon">
-                    <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
-                    <polygon points="10 9 15 12 10 15 10 9" fill="currentColor"></polygon>
-                </svg>
-            </a>
-            <a href="#" class="instagram-bottom-tab" id="tab-messages" title="Direct Messages">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                    stroke-linejoin="round" class="nav-icon">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </a>
-            <a href="#" class="instagram-bottom-tab" id="tab-friends" title="Search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                    stroke-linejoin="round" class="nav-icon">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </a>
-            <a href="#" class="instagram-bottom-tab" id="tab-profile" title="Profile">
-                <div class="profile-avatar-wrap">
-                    <div class="instagram-nav-profile-avatar">
-                        <span class="instagram-avatar-letter">H</span>
-                    </div>
-                    <span class="notification-dot"></span>
-                </div>
-            </a>
-        </nav>
     </div>
-
 
     <script src="app.js"></script>
 </body>

@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Integrates speed + steer to compute a synthetic position and named zone.
     // =========================================================================
     const LOCATION_ZONES = [
-        { name: 'Mapo River 🌉',        lat: 37.546, lon: 126.903 },
+        { name: '서울예술대학교 남산캠퍼스 심재순관', lat: 37.551, lon: 126.988 },
         { name: 'Yeouido Bridge 🌙',     lat: 37.527, lon: 126.930 },
         { name: 'Banpo Han River Park 🌿', lat: 37.512, lon: 126.997 },
         { name: 'Olympic Park ⚡',       lat: 37.520, lon: 127.124 },
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateLocationTag() {
         const zone = LOCATION_ZONES[currentZoneIndex];
         if (postLocationTag) {
-            postLocationTag.textContent = `📍 ${zone.name}`;
+            postLocationTag.textContent = `${zone.name}`;
             postLocationTag.style.display = 'inline';
             // Flash animation
             postLocationTag.style.opacity = '0';
