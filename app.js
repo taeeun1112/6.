@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // CAMERA + ISHIHARA MOSAIC
     // =========================================================================
-    let mosaicPixelSize = 36;
+    let mosaicPixelSize = 6; /* Fixed smallest circular pixel size */
     let cameraActive    = false;
     let mosaicAnimFrame = null;
     let frameCount      = 0;
@@ -933,16 +933,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
         }
  
-        // --- 5. SPEED → Mosaic pixel size (auto when no manual override) ---
-        if (!state.manualOverride) {
-            const autoSize = speedToMosaicSize(state.speed);
-            mosaicPixelSize = autoSize;
-            if (mosaicSlider)       mosaicSlider.value          = autoSize;
-            if (mosaicValDisplay)   mosaicValDisplay.textContent = `${autoSize}px`;
-        }
-        if (mosaicSpeedPx) {
-            mosaicSpeedPx.textContent = `${mosaicPixelSize}px`;
-        }
+        // --- 5. Mosaic pixel size (Fixed to smallest circular size 6px) ---
+        mosaicPixelSize = 6;
  
         // --- 6. Steer glow indicators ---
         if (leftGlow && rightGlow) {
