@@ -365,13 +365,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(0, Math.min(1, 1 - Math.sqrt(dx*dx + dy*dy)));
     }
 
+    // Load Human Interfaced Poster Image
+    const posterImage = new Image();
+    let posterLoaded = false;
+    posterImage.onload = () => {
+        posterLoaded = true;
+        if (mosaicControlBadge) {
+            mosaicControlBadge.style.opacity = '1';
+            mosaicControlBadge.style.pointerEvents = 'auto';
+        }
+        if (mosaicSpeedIndicator) mosaicSpeedIndicator.classList.add('visible');
+        const legend = document.getElementById('ishihara-legend');
+        if (legend) legend.classList.add('visible');
+        if (!mosaicAnimFrame) {
+            renderMosaicFrame();
+        }
+    };
+    posterImage.src = 'assets/poster.jpg';
+
     /**
      * Dual-zone Ishihara mosaic render:
      * - Person zone: large warm-tone pixels (hue shifts with steer)
      * - Background: small pure-grayscale pixels
      */
     function renderMosaicFrame() {
-        if (!isUsingSharedCamera && (!cameraActive || !cameraVideo || cameraVideo.readyState < 2)) {
+        if (!isUsingSharedCamera && !posterLoaded && (!cameraActive || !cameraVideo || cameraVideo.readyState < 2)) {
             mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
             return;
         }
@@ -402,10 +420,12 @@ document.addEventListener('DOMContentLoaded', () => {
             offCanvas.height = rows;
         }
 
-        // Downscale camera/video natively via drawImage
+        // Downscale frame natively via drawImage (TouchDesigner > Poster > Camera)
         if (isUsingSharedCamera && sharedFrameImage) {
             offCtx.drawImage(sharedFrameImage, 0, 0, cols, rows);
-        } else {
+        } else if (posterLoaded) {
+            offCtx.drawImage(posterImage, 0, 0, cols, rows);
+        } else if (cameraVideo && cameraVideo.readyState >= 2) {
             offCtx.drawImage(cameraVideo, 0, 0, cols, rows);
         }
 
