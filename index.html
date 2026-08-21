@@ -70,38 +70,23 @@
                 <!-- ===== POST 1: ISHIHARA MOSAIC (PC HORIZONTAL DESKTOP VIEW) ===== -->
                 <article class="instagram-post-card featured-post pc-desktop-post" id="passenger-post-card">
 
-                    <!-- LEFT COLUMN: Post Media Stage (Ishihara Mosaic Widescreen) -->
+                    <!-- LEFT COLUMN: Post Media Stage (Clean Poster View) -->
                     <div class="fb-post-media" id="passenger-media-container">
+                        <!-- Clean Poster Image maintaining native aspect ratio -->
+                        <img src="assets/poster.jpg" id="main-poster-img" class="main-poster-img" alt="Human Interfaced Poster" />
+
                         <!-- Hidden video for camera stream -->
                         <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
 
-                        <!-- Mosaic canvas: pixelated live camera feed -->
-                        <canvas id="mosaic-canvas" class="mosaic-canvas-layer"></canvas>
+                        <!-- Mosaic canvas (Hidden when viewing clean poster) -->
+                        <canvas id="mosaic-canvas" class="mosaic-canvas-layer" style="display:none;"></canvas>
 
                         <!-- Speed line particle canvas overlay -->
-                        <canvas id="riding-particles-canvas"></canvas>
+                        <canvas id="riding-particles-canvas" style="display:none;"></canvas>
 
                         <!-- Steer Edge Glows -->
                         <div class="steer-glow-indicator left-glow" id="left-steer-glow"></div>
                         <div class="steer-glow-indicator right-glow" id="right-steer-glow"></div>
-
-                        <!-- Foreground zone ellipse hint -->
-                        <div class="fg-zone-hint" id="fg-zone-hint"></div>
-
-                        <!-- Camera Permission Overlay (Hidden - Poster mode default) -->
-                        <div class="camera-permission-overlay" id="camera-permission-overlay" style="display:none; opacity:0;">
-                            <div class="camera-permission-box">
-                                <div class="camera-icon-wrap">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z" fill="currentColor" />
-                                        <path d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z" fill="currentColor" />
-                                    </svg>
-                                </div>
-                                <h3>카메라 접근 필요</h3>
-                                <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
-                                <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- RIGHT COLUMN: Post Info & Interactive Controls Panel -->

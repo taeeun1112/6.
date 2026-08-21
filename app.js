@@ -365,6 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(0, Math.min(1, 1 - Math.sqrt(dx*dx + dy*dy)));
     }
 
+    const mainPosterImg = document.getElementById('main-poster-img');
+
     // Load Human Interfaced Poster Image
     const posterImage = new Image();
     let posterLoaded = false;
@@ -377,9 +379,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mosaicSpeedIndicator) mosaicSpeedIndicator.classList.add('visible');
         const legend = document.getElementById('ishihara-legend');
         if (legend) legend.classList.add('visible');
-        if (!mosaicAnimFrame) {
-            renderMosaicFrame();
-        }
     };
     posterImage.src = 'assets/poster.jpg';
 
@@ -389,13 +388,16 @@ document.addEventListener('DOMContentLoaded', () => {
      * - Background: small pure-grayscale pixels
      */
     function renderMosaicFrame() {
-        if (!isUsingSharedCamera && !posterLoaded && (!cameraActive || !cameraVideo || cameraVideo.readyState < 2)) {
+        if (!isUsingSharedCamera) {
+            if (mosaicCanvas) mosaicCanvas.style.display = 'none';
+            if (mainPosterImg) mainPosterImg.style.display = 'block';
             mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
             return;
         }
-        if (isUsingSharedCamera && !sharedFrameImage) {
-            mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
-            return;
+
+        if (isUsingSharedCamera && sharedFrameImage) {
+            if (mosaicCanvas) mosaicCanvas.style.display = 'block';
+            if (mainPosterImg) mainPosterImg.style.display = 'none';
         }
 
         frameCount++;
