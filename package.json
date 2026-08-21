@@ -1,0 +1,16 @@
+{
+  "name": "sns-touchdesigner-server",
+  "version": "1.0.0",
+  "description": "Bridge server connecting TouchDesigner camera stream & position API generator with SNS Web UI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "tunnel": "npx localtunnel --port 3000"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}

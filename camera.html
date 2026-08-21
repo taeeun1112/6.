@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MacBook Camera Live Streamer | TouchDesigner & SNS Bridge</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.12);
+      --accent-red: #ff3b30;
+      --accent-green: #34c759;
+      --accent-blue: #007aff;
+      --text-main: #ffffff;
+      --text-muted: #8e8e93;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 10;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(255, 59, 48, 0.2);
+      color: var(--accent-red);
+      border: 1px solid rgba(255, 59, 48, 0.4);
+    }
+
+    .live-badge.active {
+      background: var(--accent-red);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 59, 48, 0.6);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      height: calc(100vh - 65px);
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .hud-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .hud-pill {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-pill .val {
+      color: var(--accent-green);
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+    .control-panel {
+      background: var(--card-bg);
+      border-left: 1px solid var(--border-color);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .panel-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #e02b20;
+      transform: translateY(-1px);
+    }
+
+    .btn-stop {
+      background: #3a3a3c;
+      color: #fff;
+    }
+
+    .btn-stop:hover {
+      background: #48484a;
+    }
+
+    .status-box {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #8e8e93;
+      margin-right: 6px;
+    }
+
+    .status-dot.connected {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <h2>🎥 MacBook Live Camera Streamer</h2>
+      <div id="live-badge" class="live-badge">OFFLINE</div>
+    </div>
+    <div id="connection-status" class="status-box">
+      <span id="status-dot" class="status-dot"></span>
+      <span id="status-text">Disconnected</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="video-container">
+      <video id="preview-video" autoplay playsinline muted></video>
+      <div class="hud-overlay">
+        <div class="hud-pill">FPS: <span id="hud-fps" class="val">0</span></div>
+        <div class="hud-pill">Res: <span id="hud-res" class="val">0x0</span></div>
+        <div class="hud-pill">Sent: <span id="hud-kb" class="val">0 KB/s</span></div>
+      </div>
+    </div>
+
+    <aside class="control-panel">
+      <div class="panel-section">
+        <div class="panel-title">Broadcasting Control</div>
+        <button id="btn-toggle-stream" class="btn btn-primary">🔴 Start Live Stream</button>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Server Connection</div>
+        <div class="input-group">
+          <label for="server-url">WebSocket Target URL</label>
+          <input type="text" id="server-url" placeholder="ws://localhost:3000">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Camera & Stream Quality</div>
+        <div class="input-group">
+          <label for="camera-select">Camera Source</label>
+          <select id="camera-select"><option value="">Loading cameras...</option></select>
+        </div>
+        <div class="input-group">
+          <label for="fps-select">Target Frame Rate (FPS)</label>
+          <select id="fps-select">
+            <option value="15">15 FPS (Save Bandwidth)</option>
+            <option value="30" selected>30 FPS (Smooth)</option>
+            <option value="60">60 FPS (High Performance)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="quality-select">JPEG Quality</label>
+          <select id="quality-select">
+            <option value="0.5">Low (0.5)</option>
+            <option value="0.75" selected>Medium (0.75)</option>
+            <option value="0.9">High (0.9)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-title">Remote View Links</div>
+        <div class="status-box" style="font-size: 12px; word-break: break-all;">
+          <b>📡 TouchDesigner WS:</b><br><code id="link-td">ws://localhost:3000</code><br><br>
+          <b>🌐 Remote Public Tunnel:</b><br><code id="link-tunnel">https://many-candies-arrive.loca.lt</code>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <canvas id="capture-canvas"></canvas>
+
+  <script>
+    const video = document.getElementById('preview-video');
+    const canvas = document.getElementById('capture-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const btnToggleStream = document.getElementById('btn-toggle-stream');
+    const cameraSelect = document.getElementById('camera-select');
+    const fpsSelect = document.getElementById('fps-select');
+    const qualitySelect = document.getElementById('quality-select');
+    const serverUrlInput = document.getElementById('server-url');
+
+    const liveBadge = document.getElementById('live-badge');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+
+    const hudFps = document.getElementById('hud-fps');
+    const hudRes = document.getElementById('hud-res');
+    const hudKb = document.getElementById('hud-kb');
+
+    let stream = null;
+    let socket = null;
+    let isStreaming = false;
+    let streamInterval = null;
+    
+    let frameCount = 0;
+    let totalBytesSent = 0;
+    let lastMetricTime = Date.now();
+
+    // Default WebSocket URL determination
+    const defaultWsUrl = window.location.protocol === 'https:'
+      ? `wss://${window.location.host}`
+      : (window.location.hostname ? `ws://${window.location.host}` : 'ws://localhost:3000');
+    
+    serverUrlInput.value = localStorage.getItem('camera_ws_url') || defaultWsUrl;
+
+    // Load available video devices
+    async function loadCameras() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+        cameraSelect.innerHTML = '';
+        videoDevices.forEach((device, index) => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          option.textContent = device.label || `Camera ${index + 1}`;
+          cameraSelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Error loading cameras:', err);
+      }
+    }
+
+    // Start local webcam stream
+    async function startCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      const deviceId = cameraSelect.value;
+      const constraints = {
+        video: {
+          deviceId: deviceId ? { exact: deviceId } : undefined,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        await video.play();
+        hudRes.textContent = `${video.videoWidth}x${video.videoHeight}`;
+      } catch (err) {
+        alert('카메라를 열 수 없습니다: ' + err.message);
+      }
+    }
+
+    // Connect to WebSocket Server
+    function connectWebSocket() {
+      const url = serverUrlInput.value.trim();
+      localStorage.setItem('camera_ws_url', url);
+
+      if (socket) {
+        socket.close();
+      }
+
+      statusText.textContent = 'Connecting...';
+      statusDot.className = 'status-dot';
+
+      try {
+        socket = new WebSocket(url);
+        socket.binaryType = 'arraybuffer';
+
+        socket.onopen = () => {
+          statusText.textContent = `Connected (${url})`;
+          statusDot.className = 'status-dot connected';
+        };
+
+        socket.onclose = () => {
+          statusText.textContent = 'Disconnected';
+          statusDot.className = 'status-dot';
+          if (isStreaming) {
+            setTimeout(connectWebSocket, 2000);
+          }
+        };
+
+        socket.onerror = (err) => {
+          statusText.textContent = 'Connection Error';
+          statusDot.className = 'status-dot';
+        };
+      } catch (e) {
+        statusText.textContent = 'Invalid WS URL';
+      }
+    }
+
+    // Capture & Send Frame loop
+    function sendFrame() {
+      if (!isStreaming || !socket || socket.readyState !== WebSocket.OPEN || !video.videoWidth) return;
+
+      const W = video.videoWidth;
+      const H = video.videoHeight;
+      canvas.width = W;
+      canvas.height = H;
+      ctx.drawImage(video, 0, 0, W, H);
+
+      const quality = parseFloat(qualitySelect.value) || 0.75;
+      canvas.toBlob((blob) => {
+        if (!blob || !socket || socket.readyState !== WebSocket.OPEN) return;
+        
+        socket.send(blob);
+        frameCount++;
+        totalBytesSent += blob.size;
+      }, 'image/jpeg', quality);
+    }
+
+    // Start / Stop Streaming Toggle
+    function toggleStreaming() {
+      if (isStreaming) {
+        // Stop
+        isStreaming = false;
+        clearInterval(streamInterval);
+        btnToggleStream.textContent = '🔴 Start Live Stream';
+        btnToggleStream.className = 'btn btn-primary';
+        liveBadge.textContent = 'OFFLINE';
+        liveBadge.classList.remove('active');
+      } else {
+        // Start
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          connectWebSocket();
+        }
+        isStreaming = true;
+        const targetFps = parseInt(fpsSelect.value) || 30;
+        const intervalMs = Math.floor(1000 / targetFps);
+
+        streamInterval = setInterval(sendFrame, intervalMs);
+
+        btnToggleStream.textContent = '⏹️ Stop Live Stream';
+        btnToggleStream.className = 'btn btn-stop';
+        liveBadge.textContent = '🔴 LIVE BROADCASTING';
+        liveBadge.classList.add('active');
+      }
+    }
+
+    // Update Telemetry Metrics (FPS / Bandwidth)
+    setInterval(() => {
+      const now = Date.now();
+      const dt = (now - lastMetricTime) / 1000;
+      if (dt > 0) {
+        const fps = Math.round(frameCount / dt);
+        const kbps = Math.round((totalBytesSent / 1024) / dt);
+        hudFps.textContent = isStreaming ? fps : '0';
+        hudKb.textContent = isStreaming ? `${kbps} KB/s` : '0 KB/s';
+      }
+      frameCount = 0;
+      totalBytesSent = 0;
+      lastMetricTime = now;
+    }, 1000);
+
+    // Event Listeners
+    btnToggleStream.addEventListener('click', toggleStreaming);
+    cameraSelect.addEventListener('change', startCamera);
+    serverUrlInput.addEventListener('change', connectWebSocket);
+
+    // Initial setup
+    navigator.mediaDevices.getUserMedia({ video: true }).then(() => {
+      loadCameras().then(startCamera);
+    }).catch(err => {
+      console.warn('Camera permission initially denied:', err);
+    });
+
+    connectWebSocket();
+  </script>
+</body>
+</html>
