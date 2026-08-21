@@ -55,13 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Last telemetry sampling timestamp
         lastSampleTime: 0,
-
-        // Camera Aesthetic & Photo state
-        activeFilter: 'mosaic', // 'mosaic', 'natural', 'vintage', 'mono'
-        timerMode: 0,           // 0 (OFF), 3, 10 (seconds)
-        flashEnabled: false,
-        gridVisible: true,
-        capturedPhotos: [],     // Array of photo objects {id, url, timestamp}
     };
 
     // =========================================================================
@@ -116,29 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const completedCaption   = document.getElementById('completed-caption');
     const completedTimestamp = document.getElementById('completed-timestamp');
 
+    // Infographic elements (removed as requested)
     const btnLikePost        = document.getElementById('btn-like-post');
-
-    // Camera Aesthetic UI DOM Bindings
-    const cameraFlashOverlay   = document.getElementById('camera-flash-overlay');
-    const cameraGridOverlay    = document.getElementById('camera-grid-overlay');
-    const cameraFocusTarget    = document.getElementById('camera-focus-target');
-    const cameraTimerCountdown = document.getElementById('camera-timer-countdown');
-    const countdownNum         = document.getElementById('countdown-num');
-    const filterPillBar        = document.getElementById('filter-pill-bar');
-    const btnToggleGrid        = document.getElementById('btn-toggle-grid');
-    const btnToggleTimer       = document.getElementById('btn-toggle-timer');
-    const timerBadgeText       = document.getElementById('timer-badge-text');
-    const cameraShutterBtn     = document.getElementById('camera-shutter-btn');
-    const cameraGalleryBtn     = document.getElementById('camera-gallery-btn');
-    const galleryThumbImg      = document.getElementById('gallery-thumb-img');
-    const galleryPlaceholder   = document.getElementById('gallery-placeholder');
-    const galleryCountBadge    = document.getElementById('gallery-count-badge');
-    const btnFlashToggle       = document.getElementById('btn-flash-toggle');
-    const photoModalOverlay    = document.getElementById('photo-modal-overlay');
-    const photoModalImg        = document.getElementById('photo-modal-img');
-    const photoModalTime       = document.getElementById('photo-modal-time');
-    const photoModalDownload   = document.getElementById('photo-modal-download');
-    const btnClosePhotoModal   = document.getElementById('btn-close-photo-modal');
 
     // =========================================================================
     // CLOCK
@@ -412,44 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const W = mosaicCanvas.width;
         const H = mosaicCanvas.height;
 
-        // Render non-mosaic filter modes (NATURAL, VINTAGE, MONO)
-        if (state.activeFilter !== 'mosaic') {
-            mosaicCtx.save();
-            if (state.activeFilter === 'natural') {
-                mosaicCtx.filter = 'brightness(1.05) contrast(1.1) saturate(1.15)';
-            } else if (state.activeFilter === 'vintage') {
-                mosaicCtx.filter = 'sepia(0.35) contrast(1.2) brightness(1.02) saturate(1.25)';
-            } else if (state.activeFilter === 'mono') {
-                mosaicCtx.filter = 'grayscale(100%) contrast(1.4) brightness(1.05)';
-            }
-
-            if (isUsingSharedCamera && sharedFrameImage) {
-                mosaicCtx.drawImage(sharedFrameImage, 0, 0, W, H);
-            } else {
-                mosaicCtx.drawImage(cameraVideo, 0, 0, W, H);
-            }
-            mosaicCtx.filter = 'none';
-
-            // Draw subtle corner vignette overlay for aesthetic photo feel
-            const grad = mosaicCtx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.4, W/2, H/2, Math.max(W,H)*0.75);
-            if (state.activeFilter === 'vintage') {
-                grad.addColorStop(0, 'rgba(255, 220, 150, 0)');
-                grad.addColorStop(1, 'rgba(40, 20, 0, 0.55)');
-            } else if (state.activeFilter === 'mono') {
-                grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-                grad.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
-            } else {
-                grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-                grad.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
-            }
-            mosaicCtx.fillStyle = grad;
-            mosaicCtx.fillRect(0, 0, W, H);
-
-            mosaicCtx.restore();
-            mosaicAnimFrame = requestAnimationFrame(renderMosaicFrame);
-            return;
-        }
-
         // Pixel sizes — 5:1 ratio for dramatic zone contrast
         const fgBase = mosaicPixelSize;
         const bgBase = Math.max(4, Math.round(fgBase * 0.20));
@@ -677,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const p = cameraPermOverlay.querySelector('.camera-permission-box p');
                 if (p) {
                     if (window.location.protocol === 'file:') {
-                        p.innerHTML = '로컬 파일(file://)에서는 카메라가 차단됩니다.<br><code>node server.js</code> 실행 후 <a href="http://localhost:3000" style="color:#0095f6;">http://localhost:3000</a> 으로 접속해주세요.';
+                        p.innerHTML = '로컬 파일(file://)에서는 카메라가 차단됩니다.<br><code>node server.js</code> 실행 후 <a href="http://localhost:3000/산학%207번%20SNS/index.html" style="color:#0095f6;">http://localhost:3000</a> 으로 접속해주세요.';
                     } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                         p.textContent = '카메라 접근이 거부되었습니다. 크롬 주소창 좌측 🔒 아이콘에서 카메라를 허용해 주세요.';
                     } else if (err.name === 'NotFoundError') {
@@ -1218,6 +1152,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================================
+    // SHARED CAMERA RECEIVER LOGIC
+    // =========================================================================
+    // =========================================================================
     // SHARED CAMERA RECEIVER & TOUCHDESIGNER WEBSOCKET CLIENT
     // =========================================================================
     function setSharedImageSource(imageSource) {
@@ -1244,7 +1181,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (!isUsingSharedCamera) {
                 isUsingSharedCamera = true;
-                // Hide permission overlay
                 if (cameraPermOverlay) {
                     cameraPermOverlay.style.opacity = '0';
                     setTimeout(() => { cameraPermOverlay.style.display = 'none'; }, 400);
@@ -1257,7 +1193,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const legend = document.getElementById('ishihara-legend');
                 if (legend) legend.classList.add('visible');
                 
-                // Trigger mosaic frame rendering if not already running
                 if (!mosaicAnimFrame) {
                     renderMosaicFrame();
                 }
@@ -1313,7 +1248,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 'image/jpeg', 0.75);
     }
 
-    // Broadcast local MacBook camera frame 20 times per second (every 50ms) to server.js
     setInterval(broadcastLocalCameraFrame, 50);
 
     // Register WebSocket Connection to Server
@@ -1405,320 +1339,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (legend) legend.classList.remove('visible');
         }
     }, 1000);
-
-    // =========================================================================
-    // AUDIO SHUTTER & SOUND SYNTHESIZER (Web Audio API)
-    // =========================================================================
-    let audioCtx = null;
-
-    function getAudioContext() {
-        if (!audioCtx) {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) audioCtx = new AudioContextClass();
-        }
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        return audioCtx;
-    }
-
-    function playShutterSound() {
-        try {
-            const ctx = getAudioContext();
-            if (!ctx) return;
-
-            const now = ctx.currentTime;
-            
-            // First click (shutter blade opening)
-            const osc1 = ctx.createOscillator();
-            const gain1 = ctx.createGain();
-            osc1.type = 'triangle';
-            osc1.frequency.setValueAtTime(1200, now);
-            osc1.frequency.exponentialRampToValueAtTime(120, now + 0.04);
-            gain1.gain.setValueAtTime(0.6, now);
-            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-            osc1.connect(gain1);
-            gain1.connect(ctx.destination);
-            osc1.start(now);
-            osc1.stop(now + 0.04);
-
-            // Metallic noise snap
-            const bufferSize = Math.floor(ctx.sampleRate * 0.06);
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-            const noise = ctx.createBufferSource();
-            noise.buffer = buffer;
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.value = 3500;
-            filter.Q.value = 3;
-
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(0.5, now + 0.02);
-            noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-
-            noise.connect(filter);
-            filter.connect(noiseGain);
-            noiseGain.connect(ctx.destination);
-            noise.start(now + 0.02);
-            noise.stop(now + 0.08);
-
-            // Second click (shutter blade closing)
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(800, now + 0.06);
-            osc2.frequency.exponentialRampToValueAtTime(200, now + 0.1);
-            gain2.gain.setValueAtTime(0.4, now + 0.06);
-            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc2.connect(gain2);
-            gain2.connect(ctx.destination);
-            osc2.start(now + 0.06);
-            osc2.stop(now + 0.1);
-
-        } catch (e) {
-            console.warn('Audio click error:', e);
-        }
-    }
-
-    function playBeepSound(freq = 800, duration = 0.08) {
-        try {
-            const ctx = getAudioContext();
-            if (!ctx) return;
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(now);
-            osc.stop(now + duration);
-        } catch (e) { }
-    }
-
-    // =========================================================================
-    // PHOTO CAPTURE & GALLERY LOGIC
-    // =========================================================================
-    let isCapturing = false;
-
-    function triggerPhotoCapture() {
-        if (isCapturing) return;
-
-        if (state.timerMode > 0) {
-            runCountdownCapture(state.timerMode);
-        } else {
-            executeCaptureNow();
-        }
-    }
-
-    function runCountdownCapture(seconds) {
-        isCapturing = true;
-        if (cameraTimerCountdown) cameraTimerCountdown.classList.add('active');
-        let count = seconds;
-        if (countdownNum) countdownNum.textContent = count;
-        playBeepSound(1000, 0.1);
-
-        const timerInterval = setInterval(() => {
-            count--;
-            if (count > 0) {
-                if (countdownNum) countdownNum.textContent = count;
-                playBeepSound(1000, 0.1);
-            } else {
-                clearInterval(timerInterval);
-                if (cameraTimerCountdown) cameraTimerCountdown.classList.remove('active');
-                playBeepSound(1600, 0.2);
-                setTimeout(() => {
-                    executeCaptureNow();
-                    isCapturing = false;
-                }, 200);
-            }
-        }, 1000);
-    }
-
-    function executeCaptureNow() {
-        // Flash overlay animation
-        if (cameraFlashOverlay) {
-            cameraFlashOverlay.classList.add('flash-active');
-            setTimeout(() => {
-                cameraFlashOverlay.classList.remove('flash-active');
-            }, 150);
-        }
-
-        // Play realistic shutter sound
-        playShutterSound();
-
-        // Capture data URL from mosaicCanvas
-        if (!mosaicCanvas) return;
-        
-        // Create high-quality snapshot canvas with watermark overlay
-        const snapCanvas = document.createElement('canvas');
-        snapCanvas.width = mosaicCanvas.width;
-        snapCanvas.height = mosaicCanvas.height;
-        const snapCtx = snapCanvas.getContext('2d');
-
-        // Draw active video/mosaic frame
-        snapCtx.drawImage(mosaicCanvas, 0, 0);
-
-        // Add sleek aesthetic watermark stamp on captured photo
-        const W = snapCanvas.width;
-        const H = snapCanvas.height;
-        
-        snapCtx.save();
-        // Watermark background tag
-        snapCtx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-        snapCtx.fillRect(16, H - 46, 260, 30);
-        snapCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        snapCtx.lineWidth = 1;
-        snapCtx.strokeRect(16, H - 46, 260, 30);
-
-        // Watermark text
-        snapCtx.fillStyle = '#ffffff';
-        snapCtx.font = 'bold 12px sans-serif';
-        snapCtx.fillText('HUMAN INTERFACED', 26, H - 26);
-        
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-        snapCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        snapCtx.font = '10px monospace';
-        snapCtx.fillText(dateStr, 160, H - 26);
-        snapCtx.restore();
-
-        const dataUrl = snapCanvas.toDataURL('image/jpeg', 0.95);
-
-        const photoObj = {
-            id: Date.now(),
-            url: dataUrl,
-            timestamp: dateStr
-        };
-
-        state.capturedPhotos.unshift(photoObj);
-
-        // Update gallery thumbnail UI
-        if (galleryThumbImg) {
-            galleryThumbImg.src = dataUrl;
-            galleryThumbImg.style.display = 'block';
-        }
-        if (galleryPlaceholder) galleryPlaceholder.style.display = 'none';
-        if (galleryCountBadge) {
-            galleryCountBadge.textContent = state.capturedPhotos.length;
-            galleryCountBadge.style.display = 'flex';
-        }
-
-        // Animate gallery thumbnail bounce
-        const thumbWrap = document.querySelector('.gallery-thumb-wrap');
-        if (thumbWrap) {
-            thumbWrap.style.transform = 'scale(1.3)';
-            setTimeout(() => thumbWrap.style.transform = 'scale(1)', 300);
-        }
-    }
-
-    // Tap to focus on media container
-    passengerMedia?.addEventListener('click', (e) => {
-        // Prevent trigger if clicking on interactive buttons or controls
-        if (e.target.closest('.camera-bottom-controls') || 
-            e.target.closest('.camera-top-osd') || 
-            e.target.closest('.camera-permission-overlay')) return;
-
-        const rect = passengerMedia.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (cameraFocusTarget) {
-            cameraFocusTarget.style.left = `${x}px`;
-            cameraFocusTarget.style.top = `${y}px`;
-            cameraFocusTarget.classList.remove('active');
-            void cameraFocusTarget.offsetWidth;
-            cameraFocusTarget.classList.add('active');
-            
-            playBeepSound(1400, 0.05);
-
-            setTimeout(() => {
-                cameraFocusTarget.classList.remove('active');
-            }, 1200);
-        }
-    });
-
-    // Gallery Modal Handlers
-    cameraGalleryBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state.capturedPhotos.length === 0) return;
-        const latest = state.capturedPhotos[0];
-        if (photoModalImg) photoModalImg.src = latest.url;
-        if (photoModalTime) photoModalTime.textContent = latest.timestamp;
-        if (photoModalDownload) photoModalDownload.href = latest.url;
-        if (photoModalOverlay) photoModalOverlay.classList.add('active');
-    });
-
-    btnClosePhotoModal?.addEventListener('click', () => {
-        if (photoModalOverlay) photoModalOverlay.classList.remove('active');
-    });
-
-    photoModalOverlay?.addEventListener('click', (e) => {
-        if (e.target === photoModalOverlay) {
-            photoModalOverlay.classList.remove('active');
-        }
-    });
-
-    // OSD Button Handlers
-    // Filter Pills
-    filterPillBar?.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const filter = btn.getAttribute('data-filter');
-            state.activeFilter = filter;
-            filterPillBar.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            playBeepSound(1200, 0.04);
-        });
-    });
-
-    // Grid Toggle
-    btnToggleGrid?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        state.gridVisible = !state.gridVisible;
-        btnToggleGrid.classList.toggle('active', state.gridVisible);
-        if (cameraGridOverlay) {
-            cameraGridOverlay.classList.toggle('visible', state.gridVisible);
-        }
-        playBeepSound(1000, 0.04);
-    });
-
-    // Timer Toggle (OFF -> 3s -> 10s -> OFF)
-    btnToggleTimer?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state.timerMode === 0) state.timerMode = 3;
-        else if (state.timerMode === 3) state.timerMode = 10;
-        else state.timerMode = 0;
-
-        if (timerBadgeText) {
-            timerBadgeText.textContent = state.timerMode === 0 ? 'OFF' : `${state.timerMode}s`;
-        }
-        btnToggleTimer.classList.toggle('active', state.timerMode > 0);
-        playBeepSound(1100, 0.04);
-    });
-
-    // Flash Toggle
-    btnFlashToggle?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        state.flashEnabled = !state.flashEnabled;
-        btnFlashToggle.classList.toggle('active', state.flashEnabled);
-        if (state.flashEnabled && cameraFlashOverlay) {
-            cameraFlashOverlay.classList.add('flash-active');
-            setTimeout(() => cameraFlashOverlay.classList.remove('flash-active'), 120);
-        }
-        playBeepSound(1300, 0.04);
-    });
-
-    // Shutter Button Event
-    cameraShutterBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        triggerPhotoCapture();
-    });
 
     // =========================================================================
     // SUPABASE INTEGRATION

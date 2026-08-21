@@ -88,96 +88,6 @@
                         <!-- Foreground zone ellipse hint -->
                         <div class="fg-zone-hint" id="fg-zone-hint"></div>
 
-                        <!-- Camera Flash Overlay -->
-                        <div class="camera-flash-overlay" id="camera-flash-overlay"></div>
-
-                        <!-- Viewfinder Framing Corners -->
-                        <div class="camera-viewfinder-corners">
-                            <div class="corner corner-tl"></div>
-                            <div class="corner corner-tr"></div>
-                            <div class="corner corner-bl"></div>
-                            <div class="corner corner-br"></div>
-                        </div>
-
-                        <!-- Rule of Thirds Grid Overlay -->
-                        <div class="camera-grid-overlay visible" id="camera-grid-overlay">
-                            <div class="grid-line grid-v1"></div>
-                            <div class="grid-line grid-v2"></div>
-                            <div class="grid-line grid-h1"></div>
-                            <div class="grid-line grid-h2"></div>
-                        </div>
-
-                        <!-- Tap-to-Focus Reticle -->
-                        <div class="camera-focus-target" id="camera-focus-target">
-                            <div class="focus-box"></div>
-                            <div class="focus-cross"></div>
-                        </div>
-
-                        <!-- Timer Countdown Display -->
-                        <div class="camera-timer-countdown" id="camera-timer-countdown">
-                            <span class="countdown-num" id="countdown-num">3</span>
-                        </div>
-
-                        <!-- Top Camera OSD Bar -->
-                        <div class="camera-top-osd">
-                            <div class="osd-left">
-                                <div class="rec-badge"><span class="rec-dot"></span>LIVE REC</div>
-                                <span class="osd-res">4K UHD · 60FPS</span>
-                            </div>
-                            <div class="osd-center">
-                                <div class="filter-pill-bar" id="filter-pill-bar">
-                                    <button class="filter-pill active" data-filter="mosaic">🎨 MOSAIC</button>
-                                    <button class="filter-pill" data-filter="natural">📸 NATURAL</button>
-                                    <button class="filter-pill" data-filter="vintage">📼 RETRO FILM</button>
-                                    <button class="filter-pill" data-filter="mono">🔮 MONO</button>
-                                </div>
-                            </div>
-                            <div class="osd-right">
-                                <button class="osd-btn active" id="btn-toggle-grid" title="격자가이드 토글">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
-                                </button>
-                                <button class="osd-btn" id="btn-toggle-timer" title="타이머 설정">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    <span class="timer-badge-text" id="timer-badge-text">OFF</span>
-                                </button>
-                                <div class="osd-telemetry">
-                                    <span>ISO 200</span>
-                                    <span>f/1.8</span>
-                                    <span>RAW</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bottom Glassmorphism Camera Controls Bar -->
-                        <div class="camera-bottom-controls">
-                            <!-- Gallery Photo Thumbnail -->
-                            <button class="camera-gallery-btn" id="camera-gallery-btn" title="촬영된 사진 보기">
-                                <div class="gallery-thumb-wrap">
-                                    <img id="gallery-thumb-img" src="" alt="Captured photo" style="display:none;" />
-                                    <div class="gallery-placeholder" id="gallery-placeholder">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                                    </div>
-                                    <span class="gallery-count-badge" id="gallery-count-badge" style="display:none;">0</span>
-                                </div>
-                            </button>
-
-                            <!-- Main Metallic Shutter Button -->
-                            <div class="camera-shutter-wrap">
-                                <button class="camera-shutter-btn" id="camera-shutter-btn" title="사진 촬영">
-                                    <div class="shutter-inner-ring">
-                                        <div class="shutter-core"></div>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <!-- Flash / Action Toggle -->
-                            <div class="camera-side-action">
-                                <button class="camera-action-circle-btn" id="btn-flash-toggle" title="시뮬레이션 플래시">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Camera Permission Overlay -->
                         <div class="camera-permission-overlay" id="camera-permission-overlay">
                             <div class="camera-permission-box">
@@ -188,11 +98,10 @@
                                     </svg>
                                 </div>
                                 <h3>카메라 접근 필요</h3>
-                                <p>실시간 카메라 피드를 위해<br>카메라 권한을 허용해 주세요</p>
+                                <p>실시간 모자이크 피드를 위해<br>카메라 권한을 허용해 주세요</p>
                                 <button id="btn-request-camera" class="btn-request-camera">카메라 시작</button>
                             </div>
                         </div>
-                    </div>
                     </div>
 
                     <!-- RIGHT COLUMN: Post Info & Interactive Controls Panel -->
@@ -339,31 +248,6 @@
                 </article>
 
             </main>
-        </div>
-    </div>
-
-    <!-- ===== CAPTURED PHOTO GALLERY MODAL ===== -->
-    <div class="photo-modal-overlay" id="photo-modal-overlay">
-        <div class="photo-modal-card">
-            <div class="photo-modal-header">
-                <div class="photo-modal-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-cam-icon"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    <span>촬영된 사진</span>
-                </div>
-                <button class="photo-modal-close" id="btn-close-photo-modal">&times;</button>
-            </div>
-            <div class="photo-modal-body">
-                <div class="photo-preview-stage">
-                    <img id="photo-modal-img" src="" alt="Captured photo preview" />
-                </div>
-            </div>
-            <div class="photo-modal-footer">
-                <span class="photo-time-info" id="photo-modal-time">2026.08.20 20:05</span>
-                <a id="photo-modal-download" download="human_interfaced_photo.jpg" class="photo-download-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    사진 저장
-                </a>
-            </div>
         </div>
     </div>
 
