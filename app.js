@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const p = cameraPermOverlay.querySelector('.camera-permission-box p');
                 if (p) {
                     if (window.location.protocol === 'file:') {
-                        p.innerHTML = '로컬 파일(file://)에서는 카메라가 차단됩니다.<br><code>npm start</code> 실행 후 <a href="http://localhost:3000" style="color:#0095f6;">http://localhost:3000</a> 으로 접속해주세요.<br><span style="font-size:11px; color:#8e8e8e;">터치디자이너 연동: ws://localhost:3000 또는 POST http://localhost:3000/api/frame</span>';
+                        p.innerHTML = '로컬 파일(file://)에서는 카메라가 차단됩니다.<br><code>node server.js</code> 실행 후 <a href="http://localhost:3000" style="color:#0095f6;">http://localhost:3000</a> 으로 접속해주세요.';
                     } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                         p.textContent = '카메라 접근이 거부되었습니다. 크롬 주소창 좌측 🔒 아이콘에서 카메라를 허용해 주세요.';
                     } else if (err.name === 'NotFoundError') {
